@@ -19,6 +19,7 @@ namespace ButaAPI.Controllers.Client
             _registerExceptions = registerExceptions;
             _butaDbContext = butaDbContext;
         }
+
         #region Register
 
         [HttpGet]
@@ -43,8 +44,8 @@ namespace ButaAPI.Controllers.Client
 
             User user = new User
             {
-                FirstName = registerUserViewModel.FirstName,
-                LastName = registerUserViewModel.LastName,
+                FirstName = registerUserViewModel.FirstName.ToLower(),
+                LastName = registerUserViewModel.LastName.ToLower(),
                 Email = registerUserViewModel.Email,
                 Password = registerUserViewModel.Password,
                 CreateTime = DateTime.UtcNow,

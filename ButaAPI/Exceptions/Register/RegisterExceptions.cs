@@ -1,4 +1,5 @@
-﻿using ButaAPI.Database.CheckViewModel;
+﻿using ButaAPI.Database;
+using ButaAPI.Database.CheckViewModel;
 using ButaAPI.Database.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -9,6 +10,12 @@ namespace ButaAPI.Exceptions.Register
 {
     public class RegisterExceptions
     {
+        private readonly ButaDbContext _butaDbContext;
+        public RegisterExceptions(ButaDbContext butaDbContext)
+        {
+            _butaDbContext = butaDbContext;
+        }
+
         public List<RegisterValidationModel> CheckUserAtRegister(RegisterUserViewModel registerUserViewModel)
         {
             List<RegisterValidationModel> results = new List<RegisterValidationModel>();
@@ -24,11 +31,14 @@ namespace ButaAPI.Exceptions.Register
             {
                 results.Add(CheckUserEmail(registerUserViewModel.Email));
             }
-            if(CheckUserPassword(registerUserViewModel.Password) != null)
+            if (CheckEmailExist(registerUserViewModel.Email) != null)
+            {
+                results.Add(CheckEmailExist(registerUserViewModel.Email));
+            }
+            if (CheckUserPassword(registerUserViewModel.Password) != null)
             {
                 results.Add(CheckUserPassword(registerUserViewModel.Password));
             }
-
             return results;
         }
         public RegisterValidationModel? CheckUserFirstName(string firstName)
@@ -55,6 +65,13 @@ namespace ButaAPI.Exceptions.Register
 
             if (string.IsNullOrEmpty(email)) return new RegisterValidationModel { Key = "Email", Content = "Email is required." };
             if (!Regex.IsMatch(email, pattern)) return new RegisterValidationModel { Key = "Email", Content = "The email format is invalid" }; 
+
+            return null;
+        }
+        public RegisterValidationModel? CheckEmailExist(string email)
+        {
+            var result = _butaDbContext.Users.FirstOrDefault(x => x.Email == email);
+            if (result != null) return new RegisterValidationModel { Key = "Email", Content = "This email already exist!" };
 
             return null;
         }
