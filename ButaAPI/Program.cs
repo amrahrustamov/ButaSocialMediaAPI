@@ -1,5 +1,8 @@
 using ButaAPI.Database;
 using ButaAPI.Exceptions;
+using ButaAPI.Services.Abstracts;
+using ButaAPI.Services.Concretes;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
 
@@ -10,13 +13,18 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore).AddNewtonsoftJson(
     options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie();
 
 builder.Services
     .AddDbContext<ButaDbContext>(o =>
     {
         o.UseNpgsql(builder.Configuration.GetConnectionString("ButaDbContext"), b => b.MigrationsAssembly("ButaAPI"));
     })
-    .AddScoped<AuthExceptions>();
+    .AddScoped<IUserService, UserServices>()
+    .AddScoped<AuthExceptions>()
+    .AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -28,6 +36,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -2,9 +2,14 @@
 using ButaAPI.Database.Model;
 using ButaAPI.Database.ViewModel;
 using ButaAPI.Exceptions;
+using ButaAPI.Services.Abstracts;
+using ButaAPI.Services.Concretes;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace ButaAPI.Controllers.Client
 {
@@ -14,10 +19,12 @@ namespace ButaAPI.Controllers.Client
     {
         private readonly AuthExceptions _authExceptions;
         private readonly ButaDbContext _butaDbContext;
-        public AuthenticationController(AuthExceptions authExceptions, ButaDbContext butaDbContext)
+        private readonly IUserService _userService;
+        public AuthenticationController(AuthExceptions authExceptions, ButaDbContext butaDbContext, UserServices userService)
         {
             _authExceptions = authExceptions;
             _butaDbContext = butaDbContext;
+            _userService = userService;
         }
 
         #region Register
@@ -26,7 +33,7 @@ namespace ButaAPI.Controllers.Client
         [Route("auth/register")]
         public IActionResult Register([FromBody] RegisterViewModel registerUserViewModel)
         {
-            var checkingList = _registerExceptions.CheckUserAtRegister(registerUserViewModel);
+            var checkingList = _authExceptions.CheckUserAtRegister(registerUserViewModel);
 
             foreach (var item in checkingList)
             {
@@ -52,15 +59,33 @@ namespace ButaAPI.Controllers.Client
 
         [HttpPost]
         [Route("auth/login")]
-        public IActionResult Login([FromBody] LoginViewModel loginViewModel)
+        public async Task<IActionResult> Login([FromBody] LoginViewModel loginViewModel)
         {
             var item = _authExceptions.CheckEmailAndPassword(loginViewModel.Email, loginViewModel.Password);
 
                 if (null != item) { ModelState.AddModelError(item.Key, item.Content); }
                 if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
+                var claims = new List<Claim>
+                {
+                    new Claim("Current_User", loginViewModel.Email)
+                };
 
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var claimsPricipal = new ClaimsPrincipal(claimsIdentity);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPricipal);
 
+            return Ok();
+        }
+        #endregion
+
+        #region Logout
+
+        [HttpGet]
+        [Route("auth/logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
             return Ok();
         }
         #endregion
