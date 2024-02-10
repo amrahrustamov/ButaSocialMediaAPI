@@ -22,7 +22,7 @@ builder.Services
     {
         o.UseNpgsql(builder.Configuration.GetConnectionString("ButaDbContext"), b => b.MigrationsAssembly("ButaAPI"));
     })
-    .AddScoped<IUserService, UserServices>()
+    .AddScoped<IUserService, UserService>()
     .AddScoped<AuthExceptions>()
     .AddHttpContextAccessor();
 

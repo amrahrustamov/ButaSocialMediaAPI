@@ -19,12 +19,10 @@ namespace ButaAPI.Controllers.Client
     {
         private readonly AuthExceptions _authExceptions;
         private readonly ButaDbContext _butaDbContext;
-        private readonly IUserService _userService;
-        public AuthenticationController(AuthExceptions authExceptions, ButaDbContext butaDbContext, UserServices userService)
+        public AuthenticationController(AuthExceptions authExceptions, ButaDbContext butaDbContext)
         {
             _authExceptions = authExceptions;
             _butaDbContext = butaDbContext;
-            _userService = userService;
         }
 
         #region Register

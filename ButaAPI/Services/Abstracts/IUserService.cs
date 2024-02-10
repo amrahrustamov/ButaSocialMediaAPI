@@ -1,7 +1,10 @@
-﻿namespace ButaAPI.Services.Abstracts
+﻿using ButaAPI.Database.Model;
+
+namespace ButaAPI.Services.Abstracts
 {
-    interface IUserService
+    public interface IUserService
     {
-        bool IsCurrentUserAuthenticated();
+        public bool IsCurrentUserAuthenticated();
+        public User GetCurrentUser();
     }
 }
