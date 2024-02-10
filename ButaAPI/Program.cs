@@ -1,5 +1,5 @@
 using ButaAPI.Database;
-using ButaAPI.Exceptions.Register;
+using ButaAPI.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
 
@@ -16,7 +16,7 @@ builder.Services
     {
         o.UseNpgsql(builder.Configuration.GetConnectionString("ButaDbContext"), b => b.MigrationsAssembly("ButaAPI"));
     })
-    .AddScoped<RegisterExceptions>();
+    .AddScoped<AuthExceptions>();
 
 var app = builder.Build();
 

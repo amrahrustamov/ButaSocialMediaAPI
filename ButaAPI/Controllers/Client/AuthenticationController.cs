@@ -1,7 +1,7 @@
 ﻿using ButaAPI.Database;
 using ButaAPI.Database.Model;
 using ButaAPI.Database.ViewModel;
-using ButaAPI.Exceptions.Register;
+using ButaAPI.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,27 +12,19 @@ namespace ButaAPI.Controllers.Client
     [ApiController]
     public class AuthenticationController : Controller
     {
-        private readonly RegisterExceptions _registerExceptions;
+        private readonly AuthExceptions _authExceptions;
         private readonly ButaDbContext _butaDbContext;
-        public AuthenticationController(RegisterExceptions registerExceptions, ButaDbContext butaDbContext)
+        public AuthenticationController(AuthExceptions authExceptions, ButaDbContext butaDbContext)
         {
-            _registerExceptions = registerExceptions;
+            _authExceptions = authExceptions;
             _butaDbContext = butaDbContext;
         }
 
         #region Register
 
-        [HttpGet]
-        [Route("auth/register")]
-        public string Get(int id)
-        {
-            //burda cookie yoxlanis olacaq
-            return "value";
-        }
-
         [HttpPost]
         [Route("auth/register")]
-        public IActionResult Post([FromBody] RegisterUserViewModel registerUserViewModel)
+        public IActionResult Register([FromBody] RegisterViewModel registerUserViewModel)
         {
             var checkingList = _registerExceptions.CheckUserAtRegister(registerUserViewModel);
 
@@ -52,6 +44,23 @@ namespace ButaAPI.Controllers.Client
             };
             _butaDbContext.Add(user);
             _butaDbContext.SaveChanges();
+            return Ok();
+        }
+        #endregion
+
+        #region Login
+
+        [HttpPost]
+        [Route("auth/login")]
+        public IActionResult Login([FromBody] LoginViewModel loginViewModel)
+        {
+            var item = _authExceptions.CheckEmailAndPassword(loginViewModel.Email, loginViewModel.Password);
+
+                if (null != item) { ModelState.AddModelError(item.Key, item.Content); }
+                if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
+
+
             return Ok();
         }
         #endregion

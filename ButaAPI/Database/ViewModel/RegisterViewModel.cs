@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ButaAPI.Database.ViewModel
 {
-    public class RegisterUserViewModel
+    public class RegisterViewModel
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
