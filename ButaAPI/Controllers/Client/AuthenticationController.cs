@@ -1,8 +1,10 @@
-﻿using ButaAPI.Database.Model;
+﻿using ButaAPI.Database;
+using ButaAPI.Database.Model;
 using ButaAPI.Database.ViewModel;
 using ButaAPI.Exceptions.Register;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ButaAPI.Controllers.Client
 {
@@ -11,9 +13,11 @@ namespace ButaAPI.Controllers.Client
     public class AuthenticationController : Controller
     {
         private readonly RegisterExceptions _registerExceptions;
-        public AuthenticationController(RegisterExceptions registerExceptions)
+        private readonly ButaDbContext _butaDbContext;
+        public AuthenticationController(RegisterExceptions registerExceptions, ButaDbContext butaDbContext)
         {
             _registerExceptions = registerExceptions;
+            _butaDbContext = butaDbContext;
         }
         #region Register
 
@@ -43,38 +47,12 @@ namespace ButaAPI.Controllers.Client
                 LastName = registerUserViewModel.LastName,
                 Email = registerUserViewModel.Email,
                 Password = registerUserViewModel.Password,
-                CreateTime = DateTime.Now,
+                CreateTime = DateTime.UtcNow,
             };
+            _butaDbContext.Add(user);
+            _butaDbContext.SaveChanges();
             return Ok();
         }
         #endregion
-
-
-        //[HttpPost]
-        //public IEnumerable<string> Get()
-        //{
-        //    return new string[] { "value1", "value2" };
-        //}
-
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
-
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
-
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }

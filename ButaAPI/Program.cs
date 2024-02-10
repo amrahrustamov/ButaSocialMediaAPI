@@ -1,4 +1,6 @@
+using ButaAPI.Database;
 using ButaAPI.Exceptions.Register;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,7 +11,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore).AddNewtonsoftJson(
     options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 
-builder.Services.AddScoped<RegisterExceptions>();
+builder.Services
+    .AddDbContext<ButaDbContext>(o =>
+    {
+        o.UseNpgsql(builder.Configuration.GetConnectionString("ButaDbContext"), b => b.MigrationsAssembly("ButaAPI"));
+    })
+    .AddScoped<RegisterExceptions>();
 
 var app = builder.Build();
 
