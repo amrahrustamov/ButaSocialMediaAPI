@@ -32,5 +32,6 @@ namespace ButaAPI.Database.Model
         public ICollection<Blog>? Blogs { get; set; }
         public ICollection<User>? Friends { get; set; }
         public ICollection<Notifications>? Notifications { get; set; }
+        public ICollection<FriendshipRequest>? FriendshipRequests { get; set; }
     }
 }

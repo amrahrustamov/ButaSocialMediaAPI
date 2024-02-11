@@ -27,7 +27,7 @@ namespace ButaAPI.Controllers.Client
         [Route("user")]
         public IActionResult UserInfo()
         {
-            if(!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var item = _userService.GetCurrentUser();
 
             return Ok();
@@ -52,16 +52,16 @@ namespace ButaAPI.Controllers.Client
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
-            if(addBlogViewModel.Image != null || addBlogViewModel.Content != null)
+            if (addBlogViewModel.Image != null || addBlogViewModel.Content != null)
             {
                 Blog blog = new Blog
                 {
-                   OwnerId = user.Id,
-                   Content = addBlogViewModel.Content,
-                   Location = addBlogViewModel.Location,
-                   Tags = addBlogViewModel.Tags,
-                   Image = addBlogViewModel.Image,
-                   DateTime = addBlogViewModel.DateTime
+                    OwnerId = user.Id,
+                    Content = addBlogViewModel.Content,
+                    Location = addBlogViewModel.Location,
+                    Tags = addBlogViewModel.Tags,
+                    Image = addBlogViewModel.Image,
+                    DateTime = addBlogViewModel.DateTime
                 };
                 _butaDbContext.Add(blog);
                 _butaDbContext.SaveChanges();
@@ -80,7 +80,7 @@ namespace ButaAPI.Controllers.Client
             var user = _userService.GetCurrentUser();
             var item = _butaDbContext.Blogs.FirstOrDefault(b => b.Id == blogId && b.OwnerId == user.Id);
 
-            if(item != null)
+            if (item != null)
             {
                 _butaDbContext.Remove(item);
                 _butaDbContext.SaveChanges();
@@ -151,5 +151,31 @@ namespace ButaAPI.Controllers.Client
         }
 
         #endregion
+
+        #region Send Friendship Request
+
+        [HttpPost]
+        [Route("send_friendship_request")]
+        public IActionResult SendFriendshipRequest([FromBody] int userId)
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+
+            FriendshipRequest request = new FriendshipRequest
+            {
+                SenderId = userId,
+                DateTime = DateTime.UtcNow
+            };
+            _butaDbContext.Add(request);
+            _butaDbContext.SaveChanges();
+            return Ok();
+
+
+
+
+
+            #endregion
+        }
     }
 }
