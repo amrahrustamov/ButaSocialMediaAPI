@@ -8,9 +8,8 @@ namespace ButaAPI.Database.Model
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public int ReceiverId { get; set; }
-        public int SenderId { get; set; }
-        public User Sender { get; set; }
+        public int UserId { get; set; }
+        public int FriendsId { get; set; }
         public DateTime DateTime { get; set; } = DateTime.Now;
     }
 }

@@ -121,7 +121,7 @@ namespace ButaAPI.Controllers.Client
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
-            if (blogId != null && content != null)
+            if (blogId > 0 && content != null)
             {
                 Comment comment = new Comment
                 {
@@ -165,8 +165,8 @@ namespace ButaAPI.Controllers.Client
             {
                 FriendshipRequest request = new FriendshipRequest
                 {
-                    SenderId = user.Id,
-                    ReceiverId = userId,
+                    UserId = user.Id,
+                    FriendsId = userId,
                     DateTime = DateTime.UtcNow
                 };
                 _butaDbContext.Add(request);
@@ -183,9 +183,46 @@ namespace ButaAPI.Controllers.Client
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
-            var requests = _butaDbContext.FriendshipsRequests.Where(r => r.ReceiverId == user.Id).ToList();
+            var requests = _butaDbContext.FriendshipsRequests.Where(r => r.FriendsId == user.Id).ToList();
 
             return Ok(requests);
+        }
+
+        [HttpPost]
+        [Route("response_friendship_request")]
+        public IActionResult ResponseFriendshipRequest([FromBody] ResponseViewModel responseViewModel)
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+            var requests = _butaDbContext.FriendshipsRequests.Where(r => r.FriendsId == user.Id && responseViewModel.Id == r.UserId).ToList();
+
+            if (responseViewModel.Response)
+            {
+                    Friendships friendship = new Friendships
+                    {
+                       User1Id = user.Id,
+                       User2Id = requests.Single().UserId
+                    };
+
+                    _butaDbContext.Friendships.Add(friendship);
+                    _butaDbContext.SaveChanges();
+
+                return Ok();
+            }
+            return NotFound();
+        }
+
+        [HttpGet]
+        [Route("show_friends")]
+        public IActionResult ShowFriends()
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+            var friends = _butaDbContext.Friendships.Where(f => f.User1Id == user.Id).ToList(); 
+           
+            return NotFound(friends);
         }
         #endregion
     }

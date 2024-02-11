@@ -27,5 +27,6 @@ namespace ButaAPI.Database
         public DbSet<Notifications> Notifications { get; set; }
         public DbSet<FriendshipRequest> FriendshipsRequests { get; set; }
         public DbSet<Location> Locations { get; set; }
+        public DbSet<Friendships> Friendships { get; set; }
     }
 }

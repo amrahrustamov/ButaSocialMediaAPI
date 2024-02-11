@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace ButaAPI.Migrations
 {
-    public partial class Added_Tables_To_Database : Migration
+    public partial class All_Tables_Added_To_Database : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -53,8 +53,7 @@ namespace ButaAPI.Migrations
                     IsAdmin = table.Column<bool>(type: "boolean", nullable: false),
                     IsPrivate = table.Column<bool>(type: "boolean", nullable: false),
                     Relationship = table.Column<int>(type: "integer", nullable: true),
-                    ProfileImage = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<int>(type: "integer", nullable: true)
+                    ProfileImage = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -69,11 +68,6 @@ namespace ButaAPI.Migrations
                         column: x => x.WhereFromId,
                         principalTable: "Locations",
                         principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Users_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -86,6 +80,7 @@ namespace ButaAPI.Migrations
                     LocationId = table.Column<int>(type: "integer", nullable: true),
                     Tags = table.Column<List<string>>(type: "text[]", nullable: true),
                     OwnerId = table.Column<int>(type: "integer", nullable: false),
+                    IsPublic = table.Column<bool>(type: "boolean", nullable: false),
                     DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Image = table.Column<string>(type: "text", nullable: true)
                 },
@@ -100,6 +95,47 @@ namespace ButaAPI.Migrations
                     table.ForeignKey(
                         name: "FK_Blogs_Users_OwnerId",
                         column: x => x.OwnerId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Friendships",
+                columns: table => new
+                {
+                    FriendshipId = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    User1Id = table.Column<int>(type: "integer", nullable: false),
+                    User2Id = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Friendships", x => x.FriendshipId);
+                    table.ForeignKey(
+                        name: "FK_Friendships_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FriendshipsRequests",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    FriendsId = table.Column<int>(type: "integer", nullable: false),
+                    DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FriendshipsRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FriendshipsRequests_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -226,6 +262,16 @@ namespace ButaAPI.Migrations
                 column: "OwnerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Friendships_UserId",
+                table: "Friendships",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FriendshipsRequests_UserId",
+                table: "FriendshipsRequests",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Likes_BlogId",
                 table: "Likes",
                 column: "BlogId");
@@ -251,11 +297,6 @@ namespace ButaAPI.Migrations
                 column: "CurrentLocationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_UserId",
-                table: "Users",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Users_WhereFromId",
                 table: "Users",
                 column: "WhereFromId");
@@ -265,6 +306,12 @@ namespace ButaAPI.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Comments");
+
+            migrationBuilder.DropTable(
+                name: "Friendships");
+
+            migrationBuilder.DropTable(
+                name: "FriendshipsRequests");
 
             migrationBuilder.DropTable(
                 name: "Likes");

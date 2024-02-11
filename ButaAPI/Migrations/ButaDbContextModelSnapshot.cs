@@ -102,17 +102,41 @@ namespace ButaAPI.Migrations
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("ReceiverId")
+                    b.Property<int>("FriendsId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("SenderId")
+                    b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SenderId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("FriendshipsRequests");
+                });
+
+            modelBuilder.Entity("ButaAPI.Database.Model.Friendships", b =>
+                {
+                    b.Property<int>("FriendshipId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FriendshipId"));
+
+                    b.Property<int>("User1Id")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("User2Id")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("FriendshipId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Friendships");
                 });
 
             modelBuilder.Entity("ButaAPI.Database.Model.Like", b =>
@@ -295,9 +319,6 @@ namespace ButaAPI.Migrations
                     b.Property<int?>("Relationship")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
-
                     b.Property<int?>("WhereFromId")
                         .HasColumnType("integer");
 
@@ -307,8 +328,6 @@ namespace ButaAPI.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CurrentLocationId");
-
-                    b.HasIndex("UserId");
 
                     b.HasIndex("WhereFromId");
 
@@ -353,13 +372,18 @@ namespace ButaAPI.Migrations
 
             modelBuilder.Entity("ButaAPI.Database.Model.FriendshipRequest", b =>
                 {
-                    b.HasOne("ButaAPI.Database.Model.User", "Sender")
+                    b.HasOne("ButaAPI.Database.Model.User", null)
                         .WithMany("FriendshipRequests")
-                        .HasForeignKey("SenderId")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
 
-                    b.Navigation("Sender");
+            modelBuilder.Entity("ButaAPI.Database.Model.Friendships", b =>
+                {
+                    b.HasOne("ButaAPI.Database.Model.User", null)
+                        .WithMany("Friendships")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("ButaAPI.Database.Model.Like", b =>
@@ -409,10 +433,6 @@ namespace ButaAPI.Migrations
                         .WithMany()
                         .HasForeignKey("CurrentLocationId");
 
-                    b.HasOne("ButaAPI.Database.Model.User", null)
-                        .WithMany("Friends")
-                        .HasForeignKey("UserId");
-
                     b.HasOne("ButaAPI.Database.Model.Location", "WhereFrom")
                         .WithMany()
                         .HasForeignKey("WhereFromId");
@@ -433,9 +453,9 @@ namespace ButaAPI.Migrations
                 {
                     b.Navigation("Blogs");
 
-                    b.Navigation("Friends");
-
                     b.Navigation("FriendshipRequests");
+
+                    b.Navigation("Friendships");
 
                     b.Navigation("Messages");
 
