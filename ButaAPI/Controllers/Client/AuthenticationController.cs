@@ -2,13 +2,9 @@
 using ButaAPI.Database.Model;
 using ButaAPI.Database.ViewModel;
 using ButaAPI.Exceptions;
-using ButaAPI.Services.Abstracts;
-using ButaAPI.Services.Concretes;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace ButaAPI.Controllers.Client
