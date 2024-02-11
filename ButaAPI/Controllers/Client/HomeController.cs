@@ -152,6 +152,45 @@ namespace ButaAPI.Controllers.Client
 
         #endregion
 
+        #region Send Message
+
+        [HttpPost]
+        [Route("send_message")]
+        public IActionResult SendMessage([FromBody] MessageViewModel messageViewModel)
+        {
+            if (null == messageViewModel.Message) { ModelState.AddModelError("Message", "Message field cannot be empty. Please enter a message."); }
+            if (messageViewModel.Id <= 0) { ModelState.AddModelError("Receiver", "Recipient not selected."); }
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+                 Message message = new Message
+                 {
+                     Content = messageViewModel.Message,
+                     SendingTime = DateTime.UtcNow,
+                     SenderId = user.Id,
+                     ReceiverId = messageViewModel.Id
+                 };
+                 _butaDbContext.Add(message);
+                 _butaDbContext.SaveChanges();
+                 return Ok();
+        }
+
+        [HttpGet]
+        [Route("messages")]
+        public IActionResult Messages()
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+            var messages = _butaDbContext.Messages.Where(m => m.ReceiverId == user.Id).ToList();
+
+            return Ok(messages);
+        }
+
+        #endregion
+
         #region Send Friendship Request
 
         [HttpPost]
@@ -161,7 +200,7 @@ namespace ButaAPI.Controllers.Client
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
-            if(userId != 0)
+            if (userId != 0)
             {
                 FriendshipRequest request = new FriendshipRequest
                 {
