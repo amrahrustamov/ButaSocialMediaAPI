@@ -72,6 +72,23 @@ namespace ButaAPI.Controllers.Client
             return BadRequest();
         }
 
+        [HttpPost]
+        [Route("delete_blog")]
+        public IActionResult DeleteBlog([FromBody] int blogId)
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+            var item = _butaDbContext.Blogs.FirstOrDefault(b => b.Id == blogId && b.OwnerId == user.Id);
+
+            if(item != null)
+            {
+                _butaDbContext.Remove(item);
+                _butaDbContext.SaveChanges();
+                return Ok();
+            }
+            return NotFound();
+        }
+
         [HttpGet]
         [Route("user/blogs")]
         public IActionResult CurrentUserBlogs()
@@ -132,6 +149,7 @@ namespace ButaAPI.Controllers.Client
             if (comments.Count > 0) return Ok(comments);
             return NotFound();
         }
+
         #endregion
     }
 }
