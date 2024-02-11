@@ -120,6 +120,18 @@ namespace ButaAPI.Controllers.Client
             ModelState.AddModelError("Empty", "Content can not be empty");
             return BadRequest(ModelState);
         }
+
+        [HttpPost]
+        [Route("blogs/comment")]
+        public IActionResult GetBlogComment(int blogId)
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+            var comments = _butaDbContext.Comments.Where(comment => comment.BlogId == blogId).ToList();
+
+            if (comments.Count > 0) return Ok(comments);
+            return NotFound();
+        }
         #endregion
     }
 }
