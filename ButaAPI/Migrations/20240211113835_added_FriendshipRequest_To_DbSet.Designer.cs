@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ButaAPI.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ButaAPI.Migrations
 {
     [DbContext(typeof(ButaDbContext))]
-    partial class ButaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240211113835_added_FriendshipRequest_To_DbSet")]
+    partial class added_FriendshipRequest_To_DbSet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

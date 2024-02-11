@@ -161,21 +161,32 @@ namespace ButaAPI.Controllers.Client
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
-
-            FriendshipRequest request = new FriendshipRequest
+            if(userId != 0)
             {
-                SenderId = userId,
-                DateTime = DateTime.UtcNow
-            };
-            _butaDbContext.Add(request);
-            _butaDbContext.SaveChanges();
-            return Ok();
-
-
-
-
-
-            #endregion
+                FriendshipRequest request = new FriendshipRequest
+                {
+                    SenderId = user.Id,
+                    ReceiverId = userId,
+                    DateTime = DateTime.UtcNow
+                };
+                _butaDbContext.Add(request);
+                _butaDbContext.SaveChanges();
+                return Ok();
+            }
+            return NotFound();
         }
+
+        [HttpGet]
+        [Route("show_friendship_request")]
+        public IActionResult ShowFriendshipRequest()
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+            var requests = _butaDbContext.FriendshipsRequests.Where(r => r.ReceiverId == user.Id).ToList();
+
+            return Ok(requests);
+        }
+        #endregion
     }
 }
