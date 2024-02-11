@@ -14,7 +14,7 @@ namespace ButaAPI.Controllers.Client
     public class HomeController : Controller
     {
         private readonly IUserService _userService;
-        ButaDbContext _butaDbContext;
+        private readonly ButaDbContext _butaDbContext;
 
         public HomeController(IUserService userService, ButaDbContext butaDbContext)
         {

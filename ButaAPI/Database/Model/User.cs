@@ -25,7 +25,7 @@ namespace ButaAPI.Database.Model
         public List<string>? Education { get; set; }
         public UserStatus RegisterStatus { get; set; } = UserStatus.Waiting;
         public bool IsAdmin { get; set; } = false;
-        public bool IsPrivate { get; set; } = false;
+        public bool? IsPrivate { get; set; } = false;
         public RelationshipStatus? Relationship { get; set; }
         public string? ProfileImage { get; set; }
         public ICollection<Message>? Messages { get; set; }
