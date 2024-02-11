@@ -83,6 +83,17 @@ namespace ButaAPI.Controllers.Client
 
             return Ok(blogs);
         }
+
+        [HttpGet]
+        [Route("blogs/{tags}")]
+        public IActionResult GetBlogsWithTags()
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+            var blogs = _butaDbContext.Blogs.Where(blog => blog.OwnerId == user.Id);
+
+            return Ok(blogs);
+        }
         #endregion
     }
 }
