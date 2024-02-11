@@ -22,7 +22,6 @@ namespace ButaAPI.Controllers.Client
             _butaDbContext = butaDbContext;
         }
 
-
         #region Current User Info
         [HttpGet]
         [Route("user")]
@@ -96,6 +95,30 @@ namespace ButaAPI.Controllers.Client
                 return Ok(blogs);
             }
             return NotFound();
+        }
+
+        [HttpPost]
+        [Route("add_comment")]
+        public IActionResult AddComment([FromBody] int blogId, string content)
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+            if (blogId != null && content != null)
+            {
+                Comment comment = new Comment
+                {
+                    Content = content,
+                    BlogId = blogId,
+                    OwnerId = user.Id,
+                    DateTime = DateTime.UtcNow
+                };
+                _butaDbContext.Add(comment);
+                _butaDbContext.SaveChanges();
+                return Ok();
+            }
+            ModelState.AddModelError("Empty", "Content can not be empty");
+            return BadRequest(ModelState);
         }
         #endregion
     }
