@@ -28,25 +28,19 @@ namespace ButaAPI.Controllers.Client
         [Route("user")]
         public IActionResult UserInfo()
         {
-            if(!_userService.IsCurrentUserAuthenticated())
-            {
-                return NotFound();
-            }
+            if(!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var item = _userService.GetCurrentUser();
 
             return Ok();
         }
         #endregion
 
-        #region All Post
+        #region Blogs
         [HttpGet]
         [Route("blogs")]
         public IActionResult GetBlogs()
         {
-            if (!_userService.IsCurrentUserAuthenticated())
-            {
-                return NotFound();
-            }
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
             return Ok();
@@ -56,6 +50,7 @@ namespace ButaAPI.Controllers.Client
         [Route("add_blog")]
         public IActionResult AddBlog([FromBody] AddBlogViewModel addBlogViewModel)
         {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
             if(addBlogViewModel.Image != null || addBlogViewModel.Content != null)
@@ -76,6 +71,17 @@ namespace ButaAPI.Controllers.Client
             if (null == addBlogViewModel.Image && null == addBlogViewModel.Content) { ModelState.AddModelError("Empty", "Content or Image can not be empty"); }
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
             return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("user/blogs")]
+        public IActionResult CurrentUserBlogs()
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+            var blogs = _butaDbContext.Blogs.Where(blog => blog.OwnerId == user.Id);
+
+            return Ok(blogs);
         }
         #endregion
     }
