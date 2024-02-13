@@ -14,7 +14,7 @@ namespace ButaAPI.Database.Model
         public string Email { get; set; }
         public string Password { get; set; }
         public string? PhoneNumber { get; set; }
-        public DateTime CreateTime { get; set; } = DateTime.Now;
+        public DateTime CreateTime { get; set; } = DateTime.UtcNow;
         public Location? WhereFrom { get; set; }
         public Location? CurrentLocation { get; set; }
         public DateTime? Birthday { get; set; }

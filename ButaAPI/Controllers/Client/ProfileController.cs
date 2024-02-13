@@ -90,10 +90,22 @@ namespace ButaAPI.Controllers.Client
         }
 
         [HttpPost]
-        [Route("add_image")]
-        public IActionResult AddImage(IFormFile image)
+        [Route("add_profile_image")]
+        public async Task<IActionResult> AddImage(IFormFile image)
         {
-            var uploadImage = image;
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images");
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
+            var fullName = path + fileName;
+
+            using var fileStream = new FileStream(fullName, FileMode.Create);
+            image.CopyTo(fileStream);
+
+            user.ProfileImage = fileName;
+            _butaDbContext.SaveChanges();
+
             return Ok();
         }
     }

@@ -19,6 +19,8 @@
 
   <ItemGroup>
     <Folder Include="Controllers\Admin\" />
+    <Folder Include="wwwroot\Uploads\Images\" />
+    <Folder Include="wwwroot\Uploads\Videos\" />
   </ItemGroup>
 
 </Project>
