@@ -88,5 +88,13 @@ namespace ButaAPI.Controllers.Client
 
             return Ok();
         }
+
+        [HttpPost]
+        [Route("add_image")]
+        public IActionResult AddImage(IFormFile image)
+        {
+            var uploadImage = image;
+            return Ok();
+        }
     }
 }

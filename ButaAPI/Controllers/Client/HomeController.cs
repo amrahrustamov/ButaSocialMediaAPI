@@ -22,27 +22,27 @@ namespace ButaAPI.Controllers.Client
             _butaDbContext = butaDbContext;
         }
 
-        #region Current User Info
-        [HttpGet]
-        [Route("user")]
-        public IActionResult UserInfo()
-        {
-            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
-            var item = _userService.GetCurrentUser();
-
-            return Ok();
-        }
-        #endregion
-
         #region Blogs
         [HttpGet]
-        [Route("blogs")]
-        public IActionResult GetBlogs()
+        [Route("user_blogs")]
+        public IActionResult GetUserBlogs()
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
+            var userBlog = _butaDbContext.Blogs.Where(b => b.OwnerId == user.Id).ToList();
 
-            return Ok();
+            return Ok(userBlog);
+        }
+
+        [HttpGet]
+        [Route("all_blogs")]
+        public IActionResult GetAllBlogs()
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+            var allBlog = _butaDbContext.Blogs.Select(b => b).ToList();
+
+            return Ok(allBlog);
         }
 
         [HttpPost]
