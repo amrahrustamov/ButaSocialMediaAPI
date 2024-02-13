@@ -96,16 +96,60 @@ namespace ButaAPI.Controllers.Client
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images");
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
-            var fullName = path + fileName;
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", fileName);
 
-            using var fileStream = new FileStream(fullName, FileMode.Create);
+            using var fileStream = new FileStream(path, FileMode.Create);
             image.CopyTo(fileStream);
 
             user.ProfileImage = fileName;
             _butaDbContext.SaveChanges();
 
+            return Ok();
+        }
+        [HttpGet]
+        [Route("get_profile_image")]
+        public async Task<IActionResult> GetProfileImage()
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+            var image = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", user.ProfileImage);
+
+            return Ok(image);
+        }
+        [HttpPost]
+        [Route("update_profile_image")]
+        public async Task<IActionResult> UpdateImage(IFormFile image)
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
+            var pathNew = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", fileName);
+            var pathOld = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", user.ProfileImage);
+
+            using var fileStream = new FileStream(pathNew, FileMode.Create);
+            image.CopyTo(fileStream);
+
+            user.ProfileImage = fileName;
+            _butaDbContext.SaveChanges();
+            System.IO.File.Delete(pathOld);
+
+            return Ok();
+        }
+        [HttpPost]
+        [Route("delete_profile_image")]
+        public async Task<IActionResult> DeleteProfileImage()
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+            var image = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", user.ProfileImage);
+
+            user.ProfileImage = null;
+            _butaDbContext.SaveChanges();
+            System.IO.File.Delete(image);
             return Ok();
         }
     }
