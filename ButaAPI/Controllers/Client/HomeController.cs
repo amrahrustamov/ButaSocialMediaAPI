@@ -5,11 +5,12 @@ using ButaAPI.Exceptions;
 using ButaAPI.Services.Abstracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ButaAPI.Controllers.Client
 {
-    [Authorize]
-    [Route("homepage")]
+   
+    [Route("home")]
     [ApiController]
     public class HomeController : Controller
     {
@@ -38,46 +39,49 @@ namespace ButaAPI.Controllers.Client
         [Route("all_blogs")]
         public IActionResult GetAllBlogs()
         {
-            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
-            var user = _userService.GetCurrentUser();
+            //if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            //var user = _userService.GetCurrentUser();
             var allBlog = _butaDbContext.Blogs.Select(b => b).ToList();
 
             return Ok(allBlog);
         }
 
-        ////[HttpPost]
-        ////[Route("add_blog")]
-        ////public IActionResult AddBlog([FromBody] AddBlogViewModel addBlogViewModel)
-        ////{
-        ////    if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
-        ////    var user = _userService.GetCurrentUser();
+        [HttpPost]
+        [Route("add_blog")]
+        public async Task<IActionResult> AddBlog([FromBody] AddBlogViewModel addBlogViewModel)
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
 
-        ////    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "images");
-        ////    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(addBlogViewModel.Image)}";
-        ////    var fullName = path + fileName;
-
-        ////    using var fileStream = new FileStream(fullName, FileMode.Create);
-        ////    addBlogViewModel.Image.CopyTo(fileStream);
-
-        ////    if (addBlogViewModel.Image != null || addBlogViewModel.Content != null)
-        ////    {
-        ////        Blog blog = new Blog
-        ////        {
-        ////            OwnerId = user.Id,
-        ////            Content = addBlogViewModel.Content,
-        ////            Location = addBlogViewModel.Location,
-        ////            Tags = addBlogViewModel.Tags,
-        ////            Image = fileName,
-        ////            DateTime = addBlogViewModel.DateTime
-        ////        };
-        ////        _butaDbContext.Add(blog);
-        ////        _butaDbContext.SaveChanges();
-        ////        return Ok();
-        ////    }
-        ////    if (null == addBlogViewModel.Image && null == addBlogViewModel.Content) { ModelState.AddModelError("Empty", "Content or Image can not be empty"); }
-        ////    if (!ModelState.IsValid) { return BadRequest(ModelState); }
-        ////    return BadRequest();
-        ////}
+            if (addBlogViewModel.Image != null || addBlogViewModel.Content != null)
+            {
+                Blog blog = new Blog
+                {
+                    OwnerId = user.Id,
+                    Content = addBlogViewModel.Content,
+                    Location = addBlogViewModel.Location,
+                    Tags = addBlogViewModel.Tags,
+                    DateTime = addBlogViewModel.DateTime
+                };
+                if (addBlogViewModel.Image != null)
+                {
+                    foreach (var item in addBlogViewModel.Image)
+                    {
+                        var fileName = $"{Guid.NewGuid()}{Path.GetExtension(item.FileName)}";
+                        var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", fileName);
+                        using var fileStream = new FileStream(path, FileMode.Create);
+                        item.CopyTo(fileStream);
+                        blog.Image = fileName;
+                    }
+                }
+                _butaDbContext.Add(blog);
+                _butaDbContext.SaveChanges();
+                return Ok();
+            }
+            if (null == addBlogViewModel.Image && null == addBlogViewModel.Content) { ModelState.AddModelError("Empty", "Content or Image can not be empty"); }
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+            return BadRequest();
+       }
 
         [HttpPost]
         [Route("delete_blog")]

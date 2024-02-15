@@ -24,7 +24,7 @@ namespace ButaAPI.Controllers.Client
 
         [HttpGet]
         [Route("get_user_info")]
-        public IActionResult EditProfile()
+        public IActionResult GetUserInfo()
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
@@ -61,29 +61,23 @@ namespace ButaAPI.Controllers.Client
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
-            var userinfo = _butaDbContext.Users.Where(u => u.Id == user.Id).ToList();
 
-            User userInfo = new User
-            {
-                FirstName = editProfileModel.FirstName,
-                LastName = editProfileModel.LastName,
-                Email = editProfileModel.Email,
-                Education = editProfileModel.Education,
-                AboutUser = editProfileModel.AboutUser,
-                Work = editProfileModel.Work,
-                Activities = editProfileModel.Activities,
-                Birthday = editProfileModel.Birthday,
-                CurrentLocation = editProfileModel.CurrentLocation,
-                Gender = editProfileModel.Gender,
-                IsPrivate = editProfileModel.IsPrivate,
-                Password = editProfileModel.Password,
-                PhoneNumber = editProfileModel.PhoneNumber,
-                ProfileImage = editProfileModel.ProfileImage,
-                Relationship = editProfileModel.Relationship,
-                WhereFrom = editProfileModel.WhereFrom
-            };
+            user.FirstName = editProfileModel.FirstName;
+            user.LastName = editProfileModel.LastName;
+            user.Email = editProfileModel.Email;
+            user.Education = editProfileModel.Education;
+            user.AboutUser = editProfileModel.AboutUser;
+            user.Work = editProfileModel.Work;
+            user.Activities = editProfileModel.Activities;
+            user.Birthday = editProfileModel.Birthday;
+            user.CurrentLocation = editProfileModel.CurrentLocation;
+            user.Gender = editProfileModel.Gender;
+            user.IsPrivate = editProfileModel.IsPrivate;
+            user.Password = editProfileModel.Password;
+            user.PhoneNumber = editProfileModel.PhoneNumber;
+            user.Relationship = editProfileModel.Relationship;
+            user.WhereFrom = editProfileModel.WhereFrom;
 
-            _butaDbContext.Users.Update(userInfo);
             _butaDbContext.SaveChanges();
 
             return Ok();

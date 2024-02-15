@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace ButaAPI.Controllers.Client
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class AuthenticationController : Controller
     {
@@ -53,21 +53,12 @@ namespace ButaAPI.Controllers.Client
 
         [HttpPost]
         [Route("auth/login")]
-        public async Task<IActionResult> Login([FromBody] LoginViewModel loginViewModel)
+        public IActionResult Login([FromBody] LoginViewModel loginViewModel)
         {
             var item = _authExceptions.CheckEmailAndPassword(loginViewModel.Email, loginViewModel.Password);
 
                 if (null != item) { ModelState.AddModelError(item.Key, item.Content); }
                 if (!ModelState.IsValid) { return BadRequest(ModelState); }
-
-                var claims = new List<Claim>
-                {
-                    new Claim("Current_User", loginViewModel.Email)
-                };
-
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var claimsPricipal = new ClaimsPrincipal(claimsIdentity);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimsPricipal);
 
             return Ok();
         }

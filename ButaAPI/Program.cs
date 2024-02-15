@@ -16,6 +16,14 @@ builder.Services.AddControllers().AddNewtonsoftJson(options => options.Serialize
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder.WithOrigins("http://localhost:3000")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials());
+});
 
 builder.Services
     .AddDbContext<ButaDbContext>(o =>
@@ -38,6 +46,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("AllowSpecificOrigin");
+
 
 app.MapControllers();
 

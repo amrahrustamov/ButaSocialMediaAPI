@@ -58,7 +58,7 @@ namespace ButaAPI.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Blogs");
+                    b.ToTable("Blogs", (string)null);
                 });
 
             modelBuilder.Entity("ButaAPI.Database.Model.Comment", b =>
@@ -88,7 +88,7 @@ namespace ButaAPI.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("ButaAPI.Database.Model.FriendshipRequest", b =>
@@ -112,7 +112,7 @@ namespace ButaAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("FriendshipsRequests");
+                    b.ToTable("FriendshipsRequests", (string)null);
                 });
 
             modelBuilder.Entity("ButaAPI.Database.Model.Friendships", b =>
@@ -136,7 +136,7 @@ namespace ButaAPI.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Friendships");
+                    b.ToTable("Friendships", (string)null);
                 });
 
             modelBuilder.Entity("ButaAPI.Database.Model.Like", b =>
@@ -162,7 +162,7 @@ namespace ButaAPI.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Likes");
+                    b.ToTable("Likes", (string)null);
                 });
 
             modelBuilder.Entity("ButaAPI.Database.Model.Location", b =>
@@ -194,7 +194,7 @@ namespace ButaAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Locations");
+                    b.ToTable("Locations", (string)null);
                 });
 
             modelBuilder.Entity("ButaAPI.Database.Model.Message", b =>
@@ -225,7 +225,7 @@ namespace ButaAPI.Migrations
 
                     b.HasIndex("ReceiverId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("ButaAPI.Database.Model.Notifications", b =>
@@ -253,7 +253,7 @@ namespace ButaAPI.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("ButaAPI.Database.Model.User", b =>
@@ -331,7 +331,7 @@ namespace ButaAPI.Migrations
 
                     b.HasIndex("WhereFromId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("ButaAPI.Database.Model.Blog", b =>
