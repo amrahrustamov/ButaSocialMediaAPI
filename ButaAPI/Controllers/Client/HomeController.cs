@@ -42,7 +42,7 @@ namespace ButaAPI.Controllers.Client
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
-            var allBlog = _butaDbContext.Blogs.Select(b => b).ToList();
+            var allBlog = _butaDbContext.Blogs.ToList();
 
             return Ok(allBlog);
         }

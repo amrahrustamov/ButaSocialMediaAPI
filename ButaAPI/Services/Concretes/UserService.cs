@@ -29,7 +29,9 @@ namespace ButaAPI.Services.Concretes
         public User GetCurrentUser()
         {
             var claims = _httpContextAccessor.HttpContext.User.Claims.ToList();
-            return  new User { Email = claims[0].Value };
+            var claim = claims[0];
+            var currentUser = _butaDbContext.Users.FirstOrDefault(u => u.Email == claim.Value);
+            return currentUser;
         }
 
         public UserPrivateInfo GetUserShortInfo(int id)

@@ -106,12 +106,16 @@ namespace ButaAPI.Controllers.Client
         public async Task<IActionResult> GetProfileImage()
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
-            var user = _userService.GetCurrentUser();
+            var currentUser = _userService.GetCurrentUser();
+            var user = _butaDbContext.Users.FirstOrDefault(u => u.Email == currentUser.Email);
+            var image = Path.Combine("C:\\Users\\Amrah\\Desktop\\ButaSocialMediaAPI\\ButaAPI\\wwwroot\\Uploads\\Images", user.ProfileImage);
 
-            var image = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", user.ProfileImage);
-            var test = image;
+            if (System.IO.File.Exists(image))
+            {
+                return File(System.IO.File.ReadAllBytes(image), "image/jpeg");
+            }
 
-            return Ok(image);
+            return NotFound();
         }
         [HttpPost]
         [Route("update_profile_image")]

@@ -70,6 +70,7 @@ app.UseCookiePolicy(new CookiePolicyOptions
     MinimumSameSitePolicy = SameSiteMode.None,
     Secure = CookieSecurePolicy.Always
 });
+app.UseStaticFiles();
 
 app.MapControllers();
 app.Run();
