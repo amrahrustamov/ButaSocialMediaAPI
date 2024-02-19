@@ -2,6 +2,8 @@
 using ButaAPI.Database.Model;
 using ButaAPI.Database.ViewModel;
 using ButaAPI.Exceptions;
+using ButaAPI.Services.Abstracts;
+using ButaAPI.Services.Concretes;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +17,35 @@ namespace ButaAPI.Controllers.Client
     {
         private readonly AuthExceptions _authExceptions;
         private readonly ButaDbContext _butaDbContext;
-        public AuthenticationController(AuthExceptions authExceptions, ButaDbContext butaDbContext)
+        private readonly IMailkitEmailService _emailService;
+        public AuthenticationController(AuthExceptions authExceptions, ButaDbContext butaDbContext, IMailkitEmailService emailService)
         {
             _authExceptions = authExceptions;
             _butaDbContext = butaDbContext;
+            _emailService = emailService;
+           
         }
+        #region Send Email for Reset
+        [HttpPost]
+        [Route("auth/reset_password")]
+        public IActionResult ResetPassword([FromBody] string email)
+        {
+
+            _emailService.SendEmail("Reset password","<!DOCTYPE html>\r\n<html>\r\n<head>\r\n    <title>Reset password</title>\r\n</head>\r\n<body>\r\n    <h2>Reset password</h2>\r\n    <form action=\"http://localhost:5065/authentication/auth/get_new_password\" method=\"post\">\r\n        <label for=\"password\">New password:</label><br>\r\n        <input type=\"password\" id=\"password\" name=\"password\" required><br><br>\r\n        <label for=\"password2\">Repeat password:</label><br>\r\n        <input type=\"password2\" id=\"password2\" name=\"password2\" required><br><br></br>\r\n\r\n        <input type=\"submit\" value=\"Şifre Sıfırlama Bağlantısı Gönder\">\r\n    </form>\r\n</body>\r\n</html>", email);
+
+            return Ok();
+        }
+        [HttpPost]
+        [Route("auth/get_new_password")]
+        public IActionResult GetNewPassword([FromBody] string password, string password2)
+        {
+
+            
+
+            return Ok();
+        }
+
+        #endregion
 
         #region Register
 
@@ -53,12 +79,28 @@ namespace ButaAPI.Controllers.Client
 
         [HttpPost]
         [Route("auth/login")]
-        public IActionResult Login([FromBody] LoginViewModel loginViewModel)
+        public async Task<IActionResult> Login([FromBody] LoginViewModel loginViewModel)
         {
             var item = _authExceptions.CheckEmailAndPassword(loginViewModel.Email, loginViewModel.Password);
+            if (null != item) { ModelState.AddModelError(item.Key, item.Content); }
+            if (item == null)
+            {
+                var claims = new List<Claim>
+                {
+                    new Claim("Email", loginViewModel.Email),
+                    new Claim("Password", loginViewModel.Password),
+                };
 
-                if (null != item) { ModelState.AddModelError(item.Key, item.Content); }
-                if (!ModelState.IsValid) { return BadRequest(ModelState); }
+                var claimsIdentity = new ClaimsIdentity(
+                claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                claimsPrincipal);
+                
+            }
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
             return Ok();
         }
@@ -66,11 +108,12 @@ namespace ButaAPI.Controllers.Client
 
         #region Logout
 
-        [HttpGet]
-        [Route("auth/logout")]
+        [HttpPost]
+        [Route("logout")]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync();
+            await HttpContext.SignOutAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme);
             return Ok();
         }
         #endregion

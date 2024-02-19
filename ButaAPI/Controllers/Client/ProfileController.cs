@@ -109,6 +109,7 @@ namespace ButaAPI.Controllers.Client
             var user = _userService.GetCurrentUser();
 
             var image = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", user.ProfileImage);
+            var test = image;
 
             return Ok(image);
         }

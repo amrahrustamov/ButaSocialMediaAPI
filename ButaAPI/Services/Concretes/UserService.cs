@@ -18,15 +18,18 @@ namespace ButaAPI.Services.Concretes
 
         public bool IsCurrentUserAuthenticated()
         {
-            return _httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
+            var user = _httpContextAccessor.HttpContext.Request.Cookies.ToList();
+            if (user.Count > 0)
+            {
+                return true;
+            }
+            return false;
         }
 
         public User GetCurrentUser()
         {
-            var claims = _httpContextAccessor.HttpContext.User.Claims
-            .Select(c => c.Value)
-            .ToList();
-            return  _butaDbContext.Users.FirstOrDefault(user => user.Email == claims[0]);
+            var claims = _httpContextAccessor.HttpContext.User.Claims.ToList();
+            return  new User { Email = claims[0].Value };
         }
 
         public UserPrivateInfo GetUserShortInfo(int id)

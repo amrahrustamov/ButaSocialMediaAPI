@@ -3,6 +3,7 @@ using ButaAPI.Database.Model;
 using ButaAPI.Database.ViewModel;
 using ButaAPI.Exceptions;
 using ButaAPI.Services.Abstracts;
+using ButaAPI.Services.Concretes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static System.Net.Mime.MediaTypeNames;
@@ -39,8 +40,8 @@ namespace ButaAPI.Controllers.Client
         [Route("all_blogs")]
         public IActionResult GetAllBlogs()
         {
-            //if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
-            //var user = _userService.GetCurrentUser();
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
             var allBlog = _butaDbContext.Blogs.Select(b => b).ToList();
 
             return Ok(allBlog);
