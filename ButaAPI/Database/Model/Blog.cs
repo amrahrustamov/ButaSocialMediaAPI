@@ -17,6 +17,6 @@ namespace ButaAPI.Database.Model
         public User Owner { get; set; }
         public bool IsPublic { get; set; } = true;
         public DateTime DateTime { get; set; } = DateTime.Now;
-        public string? Image { get; set; }
+        public List<string>? Image { get; set; }
     }
 }

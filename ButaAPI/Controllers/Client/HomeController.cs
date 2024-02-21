@@ -36,50 +36,73 @@ namespace ButaAPI.Controllers.Client
             return Ok(userBlog);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("all_blogs")]
         public IActionResult GetAllBlogs()
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
+
             var allBlog = _butaDbContext.Blogs.ToList();
 
+            //foreach (var blog in allBlog)
+            //{
+            //    blog.Image = blog.Image.Select(imageName => Path.Combine("wwwroot\\Uploads\\Images", imageName)).ToList();
+            //}
+
             return Ok(allBlog);
+        }
+        [HttpGet]
+        [Route("images/{name}")]
+        public async Task<IActionResult> Images(string name)
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", name);
+
+            if (System.IO.File.Exists(path))
+            {
+                return File(System.IO.File.ReadAllBytes(path), "image/jpeg");
+            }
+            return NotFound();
         }
 
         [HttpPost]
         [Route("add_blog")]
-        public async Task<IActionResult> AddBlog([FromBody] AddBlogViewModel addBlogViewModel)
+        public async Task<IActionResult> AddBlog()
         {
+            var files = Request.Form.Files;
+            var form = Request.Form.ToList();
+
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
-            if (addBlogViewModel.Image != null || addBlogViewModel.Content != null)
-            {
                 Blog blog = new Blog
                 {
                     OwnerId = user.Id,
-                    Content = addBlogViewModel.Content,
-                    Location = addBlogViewModel.Location,
-                    Tags = addBlogViewModel.Tags,
-                    DateTime = addBlogViewModel.DateTime
+                    Content = form.FirstOrDefault(d => d.Key == "text").Value,
+                    Tags = form.FirstOrDefault(d => d.Key == "tags").Value.ToList(),
+                    DateTime = DateTime.UtcNow,
+                    Image = new List<string>()
                 };
-                if (addBlogViewModel.Image != null)
+            if (files != null || blog.Content != null)
+            {
+                if (files != null)
                 {
-                    foreach (var item in addBlogViewModel.Image)
+                    foreach (var item in files)
                     {
                         var fileName = $"{Guid.NewGuid()}{Path.GetExtension(item.FileName)}";
                         var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", fileName);
                         using var fileStream = new FileStream(path, FileMode.Create);
                         item.CopyTo(fileStream);
-                        blog.Image = fileName;
+                        blog.Image.Add(fileName);
                     }
                 }
                 _butaDbContext.Add(blog);
                 _butaDbContext.SaveChanges();
                 return Ok();
             }
-            if (null == addBlogViewModel.Image && null == addBlogViewModel.Content) { ModelState.AddModelError("Empty", "Content or Image can not be empty"); }
+            if (null == files && null == blog.Content) { ModelState.AddModelError("Empty", "Content or Image can not be empty"); }
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
             return BadRequest();
        }

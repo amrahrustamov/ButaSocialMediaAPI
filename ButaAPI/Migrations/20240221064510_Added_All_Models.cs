@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace ButaAPI.Migrations
 {
-    public partial class All_Tables_Added_To_Database : Migration
+    public partial class Added_All_Models : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -51,7 +51,7 @@ namespace ButaAPI.Migrations
                     Education = table.Column<List<string>>(type: "text[]", nullable: true),
                     RegisterStatus = table.Column<int>(type: "integer", nullable: false),
                     IsAdmin = table.Column<bool>(type: "boolean", nullable: false),
-                    IsPrivate = table.Column<bool>(type: "boolean", nullable: false),
+                    IsPrivate = table.Column<bool>(type: "boolean", nullable: true),
                     Relationship = table.Column<int>(type: "integer", nullable: true),
                     ProfileImage = table.Column<string>(type: "text", nullable: true)
                 },
@@ -82,7 +82,7 @@ namespace ButaAPI.Migrations
                     OwnerId = table.Column<int>(type: "integer", nullable: false),
                     IsPublic = table.Column<bool>(type: "boolean", nullable: false),
                     DateTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Image = table.Column<string>(type: "text", nullable: true)
+                    Image = table.Column<List<string>>(type: "text[]", nullable: true)
                 },
                 constraints: table =>
                 {

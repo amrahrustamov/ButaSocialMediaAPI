@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ButaAPI.Migrations
 {
     [DbContext(typeof(ButaDbContext))]
-    [Migration("20240211151614_All_Tables_Added_To_Database")]
-    partial class All_Tables_Added_To_Database
+    [Migration("20240221064510_Added_All_Models")]
+    partial class Added_All_Models
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -39,8 +39,8 @@ namespace ButaAPI.Migrations
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Image")
-                        .HasColumnType("text");
+                    b.Property<List<string>>("Image")
+                        .HasColumnType("text[]");
 
                     b.Property<bool>("IsPublic")
                         .HasColumnType("boolean");
@@ -298,7 +298,7 @@ namespace ButaAPI.Migrations
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsPrivate")
+                    b.Property<bool?>("IsPrivate")
                         .HasColumnType("boolean");
 
                     b.Property<string>("LastName")
