@@ -46,6 +46,10 @@ namespace ButaAPI.Migrations
                     b.Property<int?>("LocationId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("OwnerFullName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<int>("OwnerId")
                         .HasColumnType("integer");
 

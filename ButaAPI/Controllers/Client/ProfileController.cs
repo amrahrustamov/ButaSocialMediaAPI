@@ -108,13 +108,20 @@ namespace ButaAPI.Controllers.Client
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var currentUser = _userService.GetCurrentUser();
             var user = _butaDbContext.Users.FirstOrDefault(u => u.Email == currentUser.Email);
-            var image = Path.Combine("C:\\Users\\Amrah\\Desktop\\ButaSocialMediaAPI\\ButaAPI\\wwwroot\\Uploads\\Images", user.ProfileImage);
-
-            if (System.IO.File.Exists(image))
+            if (user.ProfileImage != null)
             {
-                return File(System.IO.File.ReadAllBytes(image), "image/jpeg");
+                 var image = Path.Combine("C:\\Users\\Amrah\\Desktop\\ButaSocialMediaAPI\\ButaAPI\\wwwroot\\Uploads\\Images", user.ProfileImage);
+                 if (System.IO.File.Exists(image))
+                 {
+                     return File(System.IO.File.ReadAllBytes(image), "image/jpeg");
+                 }
             }
-
+            var defaultImgPath = "9718d8e7-56a6-4f46-b48f-992936d3a021.jpg";
+            var defaultImage = Path.Combine("C:\\Users\\Amrah\\Desktop\\ButaSocialMediaAPI\\ButaAPI\\wwwroot\\Uploads\\Default" , defaultImgPath);
+            if (System.IO.File.Exists(defaultImage))
+            {
+                return File(System.IO.File.ReadAllBytes(defaultImage), "image/jpeg");
+            }
             return NotFound();
         }
         [HttpPost]

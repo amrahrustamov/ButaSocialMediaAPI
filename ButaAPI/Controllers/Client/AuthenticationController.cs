@@ -60,11 +60,15 @@ namespace ButaAPI.Controllers.Client
                 if (null != item) { ModelState.AddModelError(item.Key, item.Content); }
                 if (!ModelState.IsValid) { return BadRequest(ModelState); }
             }
+            var frstName = registerUserViewModel.FirstName.ToLower();
+            frstName = char.ToUpper(frstName[0]) + frstName.Substring(1);
+            var secndName = registerUserViewModel.LastName.ToLower();
+            secndName = char.ToUpper(secndName[0]) + secndName.Substring(1);
 
             User user = new User
             {
-                FirstName = registerUserViewModel.FirstName.ToLower(),
-                LastName = registerUserViewModel.LastName.ToLower(),
+                FirstName = frstName,
+                LastName = secndName,
                 Email = registerUserViewModel.Email,
                 Password = registerUserViewModel.Password,
                 CreateTime = DateTime.UtcNow,
@@ -83,8 +87,8 @@ namespace ButaAPI.Controllers.Client
         {
             var item = _authExceptions.CheckEmailAndPassword(loginViewModel.Email, loginViewModel.Password);
             if (null != item) { ModelState.AddModelError(item.Key, item.Content); }
-            if (item == null)
-            {
+            if (!ModelState.IsValid) { return BadRequest(ModelState); }
+
                 var claims = new List<Claim>
                 {
                     new Claim("Email", loginViewModel.Email),
@@ -98,9 +102,6 @@ namespace ButaAPI.Controllers.Client
                 await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 claimsPrincipal);
-                
-            }
-            if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
             return Ok();
         }

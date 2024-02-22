@@ -43,12 +43,7 @@ namespace ButaAPI.Controllers.Client
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
-            var allBlog = _butaDbContext.Blogs.ToList();
-
-            //foreach (var blog in allBlog)
-            //{
-            //    blog.Image = blog.Image.Select(imageName => Path.Combine("wwwroot\\Uploads\\Images", imageName)).ToList();
-            //}
+            var allBlog = _butaDbContext.Blogs.OrderByDescending(b => b).ToList();
 
             return Ok(allBlog);
         }
@@ -64,6 +59,11 @@ namespace ButaAPI.Controllers.Client
             {
                 return File(System.IO.File.ReadAllBytes(path), "image/jpeg");
             }
+            var defaultImage = Path.Combine("C:\\Users\\Amrah\\Desktop\\ButaSocialMediaAPI\\ButaAPI\\wwwroot\\Uploads\\Default\\9718d8e7-56a6-4f46-b48f-992936d3a021.jpg");
+            if (System.IO.File.Exists(defaultImage))
+            {
+                return File(System.IO.File.ReadAllBytes(defaultImage), "image/jpeg");
+            }
             return NotFound();
         }
 
@@ -76,15 +76,21 @@ namespace ButaAPI.Controllers.Client
 
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
+            var tags = form.FirstOrDefault(d => d.Key == "tags").Value;
+            string[] tagssArr = tags.ToArray();
+            var visibility = form.FirstOrDefault(v => v.Key == "isPublic").Value;
 
-                Blog blog = new Blog
-                {
-                    OwnerId = user.Id,
-                    Content = form.FirstOrDefault(d => d.Key == "text").Value,
-                    Tags = form.FirstOrDefault(d => d.Key == "tags").Value.ToList(),
-                    DateTime = DateTime.UtcNow,
-                    Image = new List<string>()
-                };
+            Blog blog = new Blog
+            {
+                OwnerId = user.Id,
+                OwnerFullName = user.FirstName + " " + user.LastName,
+                Content = form.FirstOrDefault(d => d.Key == "text").Value,
+                Tags = form.FirstOrDefault(d => d.Key == "tags").Value.ToList(),
+                DateTime = DateTime.UtcNow,
+                Image = new List<string>(),
+                IsPublic = visibility.ToString() == "public",
+            };
+
             if (files != null || blog.Content != null)
             {
                 if (files != null)
