@@ -6,6 +6,7 @@ using ButaAPI.Services.Abstracts;
 using ButaAPI.Services.Concretes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace ButaAPI.Controllers.Client
@@ -73,11 +74,13 @@ namespace ButaAPI.Controllers.Client
         {
             var files = Request.Form.Files;
             var form = Request.Form.ToList();
+            StringValues stringListStringValues = form.FirstOrDefault(f=>f.Key == "tags").Value.ToString();
+            string stringListString = stringListStringValues.FirstOrDefault();
+            List<string> stringList = stringListString?.Split(',').ToList() ?? new List<string>();
+
 
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
-            var tags = form.FirstOrDefault(d => d.Key == "tags").Value;
-            string[] tagssArr = tags.ToArray();
             var visibility = form.FirstOrDefault(v => v.Key == "isPublic").Value;
 
             Blog blog = new Blog
@@ -85,9 +88,9 @@ namespace ButaAPI.Controllers.Client
                 OwnerId = user.Id,
                 OwnerFullName = user.FirstName + " " + user.LastName,
                 Content = form.FirstOrDefault(d => d.Key == "text").Value,
-                Tags = form.FirstOrDefault(d => d.Key == "tags").Value.ToList(),
                 DateTime = DateTime.UtcNow,
                 Image = new List<string>(),
+                Tags = stringList,
                 IsPublic = visibility.ToString() == "public",
             };
 

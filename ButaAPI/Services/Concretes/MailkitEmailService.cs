@@ -37,7 +37,7 @@ namespace ButaAPI.Services.Concretes
         public MimeMessage CreateEmailMessage(MessageDto messageDto)
         {
             var emailMessage = new MimeMessage();
-            emailMessage.Subject = messageDto.Subject; //general.mraz18@ethereal.email
+            emailMessage.Subject = messageDto.Subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = messageDto.Content };
             emailMessage.From.Add(new MailboxAddress("amrahrustamov94@yandex.com", "amrahrustamov94@yandex.com"));
             emailMessage.To.AddRange(messageDto.Receipents.Select(r => new MailboxAddress(r, r)));

@@ -5,6 +5,7 @@ using ButaAPI.Services.Abstracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection.Metadata;
 
 namespace ButaAPI.Controllers.Client
 {
@@ -23,7 +24,7 @@ namespace ButaAPI.Controllers.Client
         }
 
         [HttpGet]
-        [Route("get_user_info")]
+        [Route("user_info")]
         public IActionResult GetUserInfo()
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
@@ -44,7 +45,6 @@ namespace ButaAPI.Controllers.Client
                 CurrentLocation = user.CurrentLocation,
                 Gender = user.Gender,
                 IsPrivate = user.IsPrivate,
-                Password = user.Password,
                 PhoneNumber = user.PhoneNumber,
                 ProfileImage = user.ProfileImage,
                 Relationship = user.Relationship,
@@ -85,21 +85,38 @@ namespace ButaAPI.Controllers.Client
 
         [HttpPost]
         [Route("add_profile_image")]
-        public async Task<IActionResult> AddImage(IFormFile image)
+        public async Task<IActionResult> AddImage()
         {
+
+            var files = Request.Form.Files;
+
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
-            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", fileName);
 
-            using var fileStream = new FileStream(path, FileMode.Create);
-            image.CopyTo(fileStream);
+            if (files != null)
+            {
+                foreach (var item in files)
+                {
+                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(item.FileName)}";
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", fileName);
+                    using var fileStream = new FileStream(path, FileMode.Create);
+                    item.CopyTo(fileStream);
 
-            user.ProfileImage = fileName;
-            _butaDbContext.SaveChanges();
+                    if (user.ProfileImage != null)
+                    {
+                        var oldFileName = user.ProfileImage.ToString();
+                        var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", oldFileName);
+                        System.IO.File.Delete(oldFilePath);
+                    }
 
-            return Ok();
+                    user.ProfileImage = fileName;
+                    _butaDbContext.Update(user);
+                    _butaDbContext.SaveChanges();
+                    return Ok();
+                }
+            }
+            return BadRequest();
         }
         [HttpGet]
         [Route("get_profile_image")]

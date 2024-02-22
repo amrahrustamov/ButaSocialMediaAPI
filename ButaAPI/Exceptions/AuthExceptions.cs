@@ -25,6 +25,13 @@ namespace ButaAPI.Exceptions
 
             return null;
         }
+        public ValidationResponseModel? CheckEmail(string email)
+        {
+            var result = _butaDbContext.Users.FirstOrDefault(x => x.Email == email);
+            if (result == null) return new ValidationResponseModel { Key = "Email", Content = "Wrong email! Try available email." };
+
+            return null;
+        }
         #endregion
 
         #region RegisterExceptions

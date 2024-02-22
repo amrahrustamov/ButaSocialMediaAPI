@@ -12,5 +12,6 @@ namespace ButaAPI.Database.ViewModel
         public string Email { get; set; }
         public string Password { get; set; }
         public DateTime CreateTime { get; set; } = DateTime.Now;
+        public string? PhoneNumber { get; set; }
     }
 }
