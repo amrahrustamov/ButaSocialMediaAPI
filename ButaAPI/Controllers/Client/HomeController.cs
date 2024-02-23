@@ -107,7 +107,7 @@ namespace ButaAPI.Controllers.Client
             {
                 OwnerId = user.Id,
                 Content = form.FirstOrDefault(d => d.Key == "text").Value,
-                DateTime = DateTime.UtcNow,
+                DateTime = DateTime.UtcNow.Date,
                 Image = new List<string>(),
                 Tags = stringList,
                 IsPublic = visibility.ToString() == "public",
@@ -208,6 +208,25 @@ namespace ButaAPI.Controllers.Client
         }
 
         [HttpPost]
+        [Route("add_like")]
+        public IActionResult AddLike([FromBody] int blogId)
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+            Like liked = new Like
+            {
+                OwnerId = user.Id,
+                BlogId=blogId,
+                DateTime=DateTime.UtcNow
+            };
+            _butaDbContext.Likes.Add(liked);
+            _butaDbContext.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpPost]
         [Route("blogs/comment")]
         public IActionResult GetBlogComment(int blogId)
         {
@@ -269,7 +288,7 @@ namespace ButaAPI.Controllers.Client
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
-            if (userId != 0)
+            if (userId > 0)
             {
                 FriendshipRequest request = new FriendshipRequest
                 {

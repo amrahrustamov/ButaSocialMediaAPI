@@ -29,7 +29,6 @@ namespace ButaAPI.Controllers.Client
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
-
             var userinfo = _butaDbContext.Users.Where(u => u.Id == user.Id).ToList();
 
             EditProfileModel editProfileModel = new EditProfileModel
@@ -44,7 +43,7 @@ namespace ButaAPI.Controllers.Client
                 Birthday = user.Birthday,
                 CurrentLocation = user.CurrentLocation,
                 Gender = user.Gender,
-                IsPrivate = user.IsPrivate,
+                UserSecure = user.UserSecure,
                 PhoneNumber = user.PhoneNumber,
                 ProfileImage = user.ProfileImage,
                 Relationship = user.Relationship,
@@ -53,7 +52,6 @@ namespace ButaAPI.Controllers.Client
 
             return Ok(editProfileModel);
         }
-
         [HttpPost]
         [Route("edit_user_info")]
         public IActionResult EditProfile(EditProfileModel editProfileModel)
@@ -61,10 +59,8 @@ namespace ButaAPI.Controllers.Client
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
-
             user.FirstName = editProfileModel.FirstName;
             user.LastName = editProfileModel.LastName;
-            user.Email = editProfileModel.Email;
             user.Education = editProfileModel.Education;
             user.AboutUser = editProfileModel.AboutUser;
             user.Work = editProfileModel.Work;
@@ -72,7 +68,7 @@ namespace ButaAPI.Controllers.Client
             user.Birthday = editProfileModel.Birthday;
             user.CurrentLocation = editProfileModel.CurrentLocation;
             user.Gender = editProfileModel.Gender;
-            user.IsPrivate = editProfileModel.IsPrivate;
+            user.UserSecure = editProfileModel.UserSecure;
             user.Password = editProfileModel.Password;
             user.PhoneNumber = editProfileModel.PhoneNumber;
             user.Relationship = editProfileModel.Relationship;
@@ -82,17 +78,14 @@ namespace ButaAPI.Controllers.Client
 
             return Ok();
         }
-
         [HttpPost]
         [Route("add_profile_image")]
         public async Task<IActionResult> AddImage()
         {
-
             var files = Request.Form.Files;
 
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
-
 
             if (files != null)
             {
@@ -177,7 +170,6 @@ namespace ButaAPI.Controllers.Client
             System.IO.File.Delete(image);
             return Ok();
         }
-
         [HttpPost]
         [Route("user_blogs")]
         public IActionResult GetUserBlogs()

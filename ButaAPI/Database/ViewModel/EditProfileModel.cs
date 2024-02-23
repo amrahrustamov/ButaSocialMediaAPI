@@ -18,7 +18,7 @@ namespace ButaAPI.Database.ViewModel
         public string? AboutUser { get; set; }
         public string? Work { get; set; }
         public List<string>? Education { get; set; }
-        public bool? IsPrivate { get; set; }
+        public UserSecure UserSecure { get; set; }
         public RelationshipStatus? Relationship { get; set; }
         public string? ProfileImage { get; set; }
     }
