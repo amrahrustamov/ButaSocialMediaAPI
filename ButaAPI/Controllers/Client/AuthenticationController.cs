@@ -76,7 +76,8 @@ namespace ButaAPI.Controllers.Client
                 Email = registerUserViewModel.Email,
                 Password = registerUserViewModel.Password,
                 CreateTime = DateTime.UtcNow,
-                PhoneNumber = registerUserViewModel.PhoneNumber
+                PhoneNumber = registerUserViewModel.PhoneNumber,
+                ProfileImage = "default.jpg"
             };
             _butaDbContext.Add(user);
             _butaDbContext.SaveChanges();
@@ -108,7 +109,8 @@ namespace ButaAPI.Controllers.Client
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 claimsPrincipal);
 
-            return Ok();
+            var user = _butaDbContext.Users.FirstOrDefault(u => u.Email == loginViewModel.Email && u.Password == loginViewModel.Password);
+            return Ok(user.Id);
         }
         #endregion
 

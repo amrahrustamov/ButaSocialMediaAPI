@@ -27,7 +27,7 @@ namespace ButaAPI.Database.Model
         public bool IsAdmin { get; set; } = false;
         public bool? IsPrivate { get; set; } = false;
         public RelationshipStatus? Relationship { get; set; }
-        public string? ProfileImage { get; set; }
+        public string ProfileImage { get; set; }
         public ICollection<Message>? Messages { get; set; }
         public ICollection<Blog>? Blogs { get; set; }
         public ICollection<Friendships>? Friendships { get; set; }

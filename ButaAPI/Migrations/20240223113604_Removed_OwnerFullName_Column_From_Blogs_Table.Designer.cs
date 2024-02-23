@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ButaAPI.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ButaAPI.Migrations
 {
     [DbContext(typeof(ButaDbContext))]
-    partial class ButaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240223113604_Removed_OwnerFullName_Column_From_Blogs_Table")]
+    partial class Removed_OwnerFullName_Column_From_Blogs_Table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

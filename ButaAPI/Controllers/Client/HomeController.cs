@@ -27,14 +27,13 @@ namespace ButaAPI.Controllers.Client
 
         #region Blogs
         [HttpGet]
-        [Route("user_blogs")]
-        public IActionResult GetUserBlogs()
+        [Route("user_id")]
+        public IActionResult GetUserId()
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
-            var userBlog = _butaDbContext.Blogs.Where(b => b.OwnerId == user.Id).ToList();
 
-            return Ok(userBlog);
+            return Ok(user.Id);
         }
 
         [HttpPost]
@@ -45,8 +44,29 @@ namespace ButaAPI.Controllers.Client
             var user = _userService.GetCurrentUser();
 
             var allBlog = _butaDbContext.Blogs.OrderByDescending(b => b).ToList();
+            var data = new List<BlogViewModel>();
 
-            return Ok(allBlog);
+            foreach (var blog in allBlog)
+            {
+                BlogViewModel blogViewModel = new BlogViewModel
+                {
+                    OwnerId = blog.OwnerId,
+                    Owner = _butaDbContext.Users.FirstOrDefault(u => u.Id == blog.OwnerId),
+                    OwnerFullName = user.FirstName + " " + user.LastName,
+                    Content = blog.Content,
+                    DateTime = blog.DateTime,
+                    Image = blog.Image,
+                    Tags = blog.Tags,
+                    IsPublic = blog.IsPublic,
+                    Id = blog.Id,
+                    Commets = blog.Commets,
+                    Likes = blog.Likes,
+                    Location = blog.Location
+                };
+                data.Add(blogViewModel);
+            }
+
+            return Ok(data);
         }
         [HttpGet]
         [Route("images/{name}")]
@@ -60,7 +80,7 @@ namespace ButaAPI.Controllers.Client
             {
                 return File(System.IO.File.ReadAllBytes(path), "image/jpeg");
             }
-            var defaultImage = Path.Combine("C:\\Users\\Amrah\\Desktop\\ButaSocialMediaAPI\\ButaAPI\\wwwroot\\Uploads\\Default\\9718d8e7-56a6-4f46-b48f-992936d3a021.jpg");
+            var defaultImage = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Default", name);
             if (System.IO.File.Exists(defaultImage))
             {
                 return File(System.IO.File.ReadAllBytes(defaultImage), "image/jpeg");
@@ -86,7 +106,6 @@ namespace ButaAPI.Controllers.Client
             Blog blog = new Blog
             {
                 OwnerId = user.Id,
-                OwnerFullName = user.FirstName + " " + user.LastName,
                 Content = form.FirstOrDefault(d => d.Key == "text").Value,
                 DateTime = DateTime.UtcNow,
                 Image = new List<string>(),
@@ -116,16 +135,22 @@ namespace ButaAPI.Controllers.Client
             return BadRequest();
        }
 
-        [HttpPost]
-        [Route("delete_blog")]
-        public IActionResult DeleteBlog([FromBody] int blogId)
+        [HttpDelete]
+        [Route("delete_blog/{id}")]
+        public IActionResult DeleteBlog(int id)
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
-            var item = _butaDbContext.Blogs.FirstOrDefault(b => b.Id == blogId && b.OwnerId == user.Id);
+            var item = _butaDbContext.Blogs.FirstOrDefault(b => b.Id == id && b.OwnerId == user.Id);
 
             if (item != null)
             {
+                foreach(var i in item.Image)
+                {
+                    var oldPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", i);
+                    System.IO.File.Delete(oldPath);
+                }
+
                 _butaDbContext.Remove(item);
                 _butaDbContext.SaveChanges();
                 return Ok();

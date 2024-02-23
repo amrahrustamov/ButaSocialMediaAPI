@@ -1,12 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using ButaAPI.Database.Model;
 
-namespace ButaAPI.Database.Model
+namespace ButaAPI.Database.ViewModel
 {
-    public class Blog
+    public class BlogViewModel
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public string? Content { get; set; }
         public Location? Location { get; set; }
@@ -15,6 +12,7 @@ namespace ButaAPI.Database.Model
         public ICollection<Like>? Likes { get; set; }
         public int OwnerId { get; set; }
         public User Owner { get; set; }
+        public string OwnerFullName { get; set; }
         public bool IsPublic { get; set; } = true;
         public DateTime DateTime { get; set; } = DateTime.Now;
         public List<string>? Image { get; set; }
