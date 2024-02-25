@@ -185,17 +185,17 @@ namespace ButaAPI.Controllers.Client
 
         [HttpPost]
         [Route("add_comment")]
-        public IActionResult AddComment([FromBody] int blogId, string content)
+        public IActionResult AddComment([FromBody] AddCommentViewModel addCommentViewModel)
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
-            if (blogId > 0 && content != null)
+            if (addCommentViewModel.BlogId > 0 && addCommentViewModel.Comment != null)
             {
                 Comment comment = new Comment
                 {
-                    Content = content,
-                    BlogId = blogId,
+                    Content = addCommentViewModel.Comment,
+                    BlogId = addCommentViewModel.BlogId,
                     OwnerId = user.Id,
                     DateTime = DateTime.UtcNow
                 };
