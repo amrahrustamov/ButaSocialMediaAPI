@@ -232,7 +232,7 @@ namespace ButaAPI.Controllers.Client
                     Content= $"Added new comment to your blog by {user}",
                     DateTime = DateTime.UtcNow,
                     OwnerId=receviver.Id,
-                    URl=
+                    URl= $"blog/{addCommentViewModel.BlogId}"
                 };
 
                 _butaDbContext.Notifications.Add(notifications);
