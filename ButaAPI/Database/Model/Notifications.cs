@@ -13,5 +13,6 @@ namespace ButaAPI.Database.Model
         public DateTime DateTime { get; set; } = DateTime.Now;
         public bool Read { get; set; } = false;
         public string Content { get; set; }
+        public string? URl {  get; set; }
     }
 }

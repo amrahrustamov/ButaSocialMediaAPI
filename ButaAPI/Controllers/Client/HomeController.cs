@@ -59,7 +59,7 @@ namespace ButaAPI.Controllers.Client
                     Tags = blog.Tags,
                     IsPublic = blog.IsPublic,
                     Id = blog.Id,
-                    Commets = blog.Commets,
+                    Commets = _butaDbContext.Comments.Where(c=>c.BlogId == blog.Id).ToList(),
                     Likes = blog.Likes,
                     Location = blog.Location
                 };
@@ -199,7 +199,17 @@ namespace ButaAPI.Controllers.Client
                     OwnerId = user.Id,
                     DateTime = DateTime.UtcNow
                 };
-                _butaDbContext.Add(comment);
+                var receiverUser = _butaDbContext.Blogs.FirstOrDefault(b => b.Id == addCommentViewModel.BlogId);
+                var receviver = receiverUser.Owner;
+                Notifications notifications = new Notifications
+                {
+                    Content= $"Added new comment to your blog by {user}",
+                    DateTime = DateTime.UtcNow,
+                    OwnerId=receviver.Id,
+                };
+
+                _butaDbContext.Notifications.Add(notifications);
+                _butaDbContext.Comments.Add(comment);
                 _butaDbContext.SaveChanges();
                 return Ok();
             }
@@ -233,8 +243,20 @@ namespace ButaAPI.Controllers.Client
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
             var comments = _butaDbContext.Comments.Where(comment => comment.BlogId == blogId).ToList();
+            List<GetCommentViewModel> result = new List<GetCommentViewModel>();
+            foreach (var comment in comments)
+            {
+                GetCommentViewModel getCommentViewModel = new GetCommentViewModel
+                {
+                    Owner = _butaDbContext.Users.FirstOrDefault(user => comment.OwnerId == user.Id),
+                    Content = comment.Content,
+                    CommentId = comment.Id,
+                    DateTime = comment.DateTime
+                };
+                result.Add(getCommentViewModel);
+            }
 
-            if (comments.Count > 0) return Ok(comments);
+            if (comments.Count > 0) return Ok(result);
             return NotFound();
         }
 
