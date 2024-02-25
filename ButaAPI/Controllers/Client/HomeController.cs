@@ -38,6 +38,32 @@ namespace ButaAPI.Controllers.Client
 
         [HttpPost]
         [Route("all_blogs")]
+        [HttpPost]
+        [Route("blog/{id}")]
+        public IActionResult GetBlog(int id)
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+            var blog = _butaDbContext.Blogs.FirstOrDefault(b => b.Id == id);
+                BlogViewModel blogViewModel = new BlogViewModel
+                {
+                    OwnerId = blog.OwnerId,
+                    Owner = _butaDbContext.Users.FirstOrDefault(u => u.Id == blog.OwnerId),
+                    OwnerFullName = user.FirstName + " " + user.LastName,
+                    Content = blog.Content,
+                    DateTime = blog.DateTime,
+                    Image = blog.Image,
+                    Tags = blog.Tags,
+                    IsPublic = blog.IsPublic,
+                    Id = blog.Id,
+                    Commets = _butaDbContext.Comments.Where(c => c.BlogId == blog.Id).ToList(),
+                    Likes = blog.Likes,
+                    Location = blog.Location
+                };
+
+            return Ok(blogViewModel);
+        }
         public IActionResult GetAllBlogs()
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
@@ -206,6 +232,7 @@ namespace ButaAPI.Controllers.Client
                     Content= $"Added new comment to your blog by {user}",
                     DateTime = DateTime.UtcNow,
                     OwnerId=receviver.Id,
+                    URl=
                 };
 
                 _butaDbContext.Notifications.Add(notifications);
