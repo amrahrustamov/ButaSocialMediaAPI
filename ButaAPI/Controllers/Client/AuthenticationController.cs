@@ -19,12 +19,14 @@ namespace ButaAPI.Controllers.Client
         private readonly ButaDbContext _butaDbContext;
         private readonly IMailkitEmailService _emailService;
         private readonly CookieService _cookieService;
-        public AuthenticationController(AuthExceptions authExceptions, ButaDbContext butaDbContext, IMailkitEmailService emailService, CookieService cookieService)
+        private readonly ModifyText _modifyText;
+        public AuthenticationController(AuthExceptions authExceptions, ButaDbContext butaDbContext, IMailkitEmailService emailService, CookieService cookieService, ModifyText modifyText)
         {
             _authExceptions = authExceptions;
             _butaDbContext = butaDbContext;
             _emailService = emailService;
             _cookieService = cookieService;
+            _modifyText = modifyText;
         }
         #region Send Email for Reset
         //[HttpPost]
@@ -58,22 +60,15 @@ namespace ButaAPI.Controllers.Client
         [Route("auth/register")]
         public IActionResult Register([FromBody] RegisterViewModel registerUserViewModel)
         {
-            var checkingList = _authExceptions.CheckUserAtRegister(registerUserViewModel);
-
-            foreach (var item in checkingList)
+            foreach (var item in _authExceptions.CheckUserAtRegister(registerUserViewModel))
             {
                 if (null != item) { ModelState.AddModelError(item.Key, item.Content); }
                 if (!ModelState.IsValid) { return BadRequest(ModelState); }
             }
-            var frstName = registerUserViewModel.FirstName.ToLower();
-            frstName = char.ToUpper(frstName[0]) + frstName.Substring(1);
-            var secndName = registerUserViewModel.LastName.ToLower();
-            secndName = char.ToUpper(secndName[0]) + secndName.Substring(1);
-
             User user = new User
             {
-                FirstName = frstName,
-                LastName = secndName,
+                FirstName = _modifyText.NormalizeName(registerUserViewModel.FirstName),
+                LastName = _modifyText.NormalizeName(registerUserViewModel.LastName),
                 Email = registerUserViewModel.Email,
                 Password = registerUserViewModel.Password,
                 CreateTime = DateTime.UtcNow,
@@ -96,10 +91,11 @@ namespace ButaAPI.Controllers.Client
             if (null != item) { ModelState.AddModelError(item.Key, item.Content); }
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-            _cookieService.CreateCookie(loginViewModel);
+            await _cookieService.CreateCookie(loginViewModel);
 
             var user = _butaDbContext.Users.FirstOrDefault(u => u.Email == loginViewModel.Email && u.Password == loginViewModel.Password);
-            return Ok(user.Id);
+            if(user != null) return Ok(user.Id);
+            return NotFound(); 
         }
         #endregion
 
@@ -109,7 +105,7 @@ namespace ButaAPI.Controllers.Client
         [Route("logout")]
         public async Task<IActionResult> Logout()
         {
-            _cookieService.RemoveCookie();
+            await _cookieService.RemoveCookie();
             return Ok();
         }
         #endregion

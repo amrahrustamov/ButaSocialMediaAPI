@@ -36,6 +36,7 @@ builder.Services
     })
     .AddScoped<IUserService, UserService>()
     .AddScoped<CookieService>()
+    .AddScoped<ModifyText>()
     .AddScoped<IMailkitEmailService, MailkitEmailService>()
     .AddScoped<AuthExceptions>()
     .AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
