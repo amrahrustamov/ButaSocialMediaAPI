@@ -1,8 +1,6 @@
 ﻿using ButaAPI.Database;
 using ButaAPI.Database.Model;
-using ButaAPI.Database.ViewModel;
 using ButaAPI.Services.Abstracts;
-using System.Security.Claims;
 
 namespace ButaAPI.Services.Concretes
 {
@@ -32,6 +30,24 @@ namespace ButaAPI.Services.Concretes
             var claim = claims[0];
             var currentUser = _butaDbContext.Users.FirstOrDefault(u => u.Email == claim.Value);
             return currentUser;
+        }
+
+        public string AddNewImage(IFormFile item)
+        {
+            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(item.FileName)}";
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", fileName);
+            using var fileStream = new FileStream(path, FileMode.Create);
+            item.CopyTo(fileStream);
+            return fileName;
+        }
+        public void RemoveOldImage(User user)
+        {
+            var oldFileName = user.ProfileImage.ToString();
+            var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", oldFileName);
+            if (File.Exists(oldFilePath))
+            {
+                System.IO.File.Delete(oldFilePath);
+            }
         }
     }
 }

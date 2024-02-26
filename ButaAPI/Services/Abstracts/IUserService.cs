@@ -7,5 +7,7 @@ namespace ButaAPI.Services.Abstracts
     {
         public bool IsCurrentUserAuthenticated();
         public User GetCurrentUser();
+        public string AddNewImage(IFormFile item);
+        public void RemoveOldImage(User user);
     }
 }

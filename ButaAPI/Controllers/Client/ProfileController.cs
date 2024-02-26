@@ -26,7 +26,6 @@ namespace ButaAPI.Controllers.Client
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
-            var userinfo = _butaDbContext.Users.Where(u => u.Id == user.Id).ToList();
 
             EditProfileModel editProfileModel = new EditProfileModel
             {
@@ -79,29 +78,16 @@ namespace ButaAPI.Controllers.Client
         [Route("add_profile_image")]
         public async Task<IActionResult> AddImage()
         {
-            var files = Request.Form.Files;
-
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
 
+            var files = Request.Form.Files;
             if (files != null)
             {
                 foreach (var item in files)
                 {
-                    var fileName = $"{Guid.NewGuid()}{Path.GetExtension(item.FileName)}";
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", fileName);
-                    using var fileStream = new FileStream(path, FileMode.Create);
-                    item.CopyTo(fileStream);
-
-                    if (user.ProfileImage != null)
-                    {
-                        var oldFileName = user.ProfileImage.ToString();
-                        var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", oldFileName);
-                        if(Directory.Exists(oldFilePath))
-                        {
-                            System.IO.File.Delete(oldFilePath);
-                        }
-                    }
+                    string fileName = _userService.AddNewImage(item);
+                    if (user.ProfileImage != null) { _userService.RemoveOldImage(user); }
 
                     user.ProfileImage = fileName;
                     _butaDbContext.Update(user);
@@ -117,6 +103,7 @@ namespace ButaAPI.Controllers.Client
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var currentUser = _userService.GetCurrentUser();
+
             var user = _butaDbContext.Users.FirstOrDefault(u => u.Email == currentUser.Email);
             if (user.ProfileImage != null)
             {
@@ -159,7 +146,6 @@ namespace ButaAPI.Controllers.Client
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
-
             var image = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", user.ProfileImage);
 
             user.ProfileImage = null;
@@ -175,7 +161,7 @@ namespace ButaAPI.Controllers.Client
             var user = _userService.GetCurrentUser();
 
             var userBlogs = _butaDbContext.Blogs.OrderByDescending(b => b).Where(ub => ub.OwnerId == user.Id).ToList();
-
+            if(userBlogs.Count == 0) return NotFound();
             return Ok(userBlogs);
         }
     }

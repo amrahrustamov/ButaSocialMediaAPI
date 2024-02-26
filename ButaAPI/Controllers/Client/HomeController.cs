@@ -47,7 +47,7 @@ namespace ButaAPI.Controllers.Client
                     Id = notification.Id,
                     Content = notification.Content,
                     DateTime = notification.DateTime,
-                    Sender = _butaDbContext.Users.FirstOrDefault(u=> u.Id == notification.SenderId),
+                    Sender = _butaDbContext.Users.FirstOrDefault(u=>u.Id == notification.SenderId),
                     Receiver = _butaDbContext.Users.FirstOrDefault(u=>u.Id == notification.ReceiverId),
                     URl = notification.URl,
                     Read = notification.Read
@@ -59,15 +59,6 @@ namespace ButaAPI.Controllers.Client
         #endregion
 
         #region Blogs
-        [HttpGet]
-        [Route("user_id")]
-        public IActionResult GetUserId()
-        {
-            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
-            var user = _userService.GetCurrentUser();
-
-            return Ok(user.Id);
-        }
 
         [HttpPost]
         [Route("blog/{id}")]
@@ -133,6 +124,7 @@ namespace ButaAPI.Controllers.Client
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
+
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "Images", name);
 
             if (System.IO.File.Exists(path))
@@ -151,15 +143,15 @@ namespace ButaAPI.Controllers.Client
         [Route("add_blog")]
         public async Task<IActionResult> AddBlog()
         {
-            var files = Request.Form.Files;
-            var form = Request.Form.ToList();
-            StringValues stringListStringValues = form.FirstOrDefault(f=>f.Key == "tags").Value.ToString();
-            string stringListString = stringListStringValues.FirstOrDefault();
-            List<string> stringList = stringListString?.Split(',').ToList() ?? new List<string>();
-
-
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
+            var form = Request.Form.ToList();
+
+            var files = Request.Form.Files;
+            StringValues stringListStringValues = form.FirstOrDefault(f=>f.Key == "tags").Value.ToString();
+            string stringListString = stringListStringValues;
+            List<string> stringList = stringListString?.Split(',').ToList() ?? new List<string>();
+
             var visibility = form.FirstOrDefault(v => v.Key == "isPublic").Value;
 
             Blog blog = new Blog
