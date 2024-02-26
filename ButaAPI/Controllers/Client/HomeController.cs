@@ -24,6 +24,39 @@ namespace ButaAPI.Controllers.Client
             _userService = userService;
             _butaDbContext = butaDbContext;
         }
+        #region Notification
+
+        [HttpGet]
+        [Route("notifications")]
+        public IActionResult GetNotifications()
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+            var notifications = _butaDbContext.Notifications
+                .Where(n=>n.ReceiverId == user.Id && n.SenderId != user.Id)
+                .OrderByDescending(b => b)
+                .ToList();
+
+            var data = new List<NotificationViewModel>();
+
+            foreach (var notification in notifications)
+            {
+                NotificationViewModel notificationModel = new NotificationViewModel
+                {
+                    Id = notification.Id,
+                    Content = notification.Content,
+                    DateTime = notification.DateTime,
+                    Sender = _butaDbContext.Users.FirstOrDefault(u=> u.Id == notification.SenderId),
+                    Receiver = _butaDbContext.Users.FirstOrDefault(u=>u.Id == notification.ReceiverId),
+                    URl = notification.URl,
+                    Read = notification.Read
+                };
+                data.Add(notificationModel);
+            }
+            return Ok(data);
+        }
+        #endregion
 
         #region Blogs
         [HttpGet]
@@ -225,14 +258,14 @@ namespace ButaAPI.Controllers.Client
                     OwnerId = user.Id,
                     DateTime = DateTime.UtcNow
                 };
-                var receiverUser = _butaDbContext.Blogs.FirstOrDefault(b => b.Id == addCommentViewModel.BlogId);
-                var receviver = receiverUser.Owner;
+                var ownerOfBlog = _butaDbContext.Blogs.FirstOrDefault(b => b.Id == addCommentViewModel.BlogId);
                 Notifications notifications = new Notifications
                 {
                     Content= $"Added new comment to your blog by {user.FirstName} {user.LastName}",
                     DateTime = DateTime.UtcNow,
-                    OwnerId=receviver.Id,
-                    URl= $"blog/{addCommentViewModel.BlogId}"
+                    SenderId = user.Id,
+                    ReceiverId = ownerOfBlog.OwnerId,
+                    URl = $"blog/{addCommentViewModel.BlogId}"
                 };
 
                 _butaDbContext.Notifications.Add(notifications);
@@ -263,18 +296,20 @@ namespace ButaAPI.Controllers.Client
             return Ok();
         }
 
-        [HttpPost]
-        [Route("blogs/comment")]
+        [HttpGet]
+        [Route("comments/blog/{blogId}")]
         public IActionResult GetBlogComment(int blogId)
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
             var comments = _butaDbContext.Comments.Where(comment => comment.BlogId == blogId).ToList();
             List<GetCommentViewModel> result = new List<GetCommentViewModel>();
+            var countComments = comments.Count;
             foreach (var comment in comments)
             {
                 GetCommentViewModel getCommentViewModel = new GetCommentViewModel
                 {
+                    CountOfComment = countComments,
                     Owner = _butaDbContext.Users.FirstOrDefault(user => comment.OwnerId == user.Id),
                     Content = comment.Content,
                     CommentId = comment.Id,
