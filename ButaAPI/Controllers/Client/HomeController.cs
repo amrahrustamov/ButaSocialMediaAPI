@@ -37,8 +37,6 @@ namespace ButaAPI.Controllers.Client
         }
 
         [HttpPost]
-        [Route("all_blogs")]
-        [HttpPost]
         [Route("blog/{id}")]
         public IActionResult GetBlog(int id)
         {
@@ -64,6 +62,8 @@ namespace ButaAPI.Controllers.Client
 
             return Ok(blogViewModel);
         }
+        [HttpPost]
+        [Route("all_blogs")]
         public IActionResult GetAllBlogs()
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
@@ -229,7 +229,7 @@ namespace ButaAPI.Controllers.Client
                 var receviver = receiverUser.Owner;
                 Notifications notifications = new Notifications
                 {
-                    Content= $"Added new comment to your blog by {user}",
+                    Content= $"Added new comment to your blog by {user.FirstName} {user.LastName}",
                     DateTime = DateTime.UtcNow,
                     OwnerId=receviver.Id,
                     URl= $"blog/{addCommentViewModel.BlogId}"

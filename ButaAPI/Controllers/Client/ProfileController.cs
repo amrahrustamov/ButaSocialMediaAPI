@@ -1,11 +1,8 @@
 ﻿using ButaAPI.Database;
-using ButaAPI.Database.Model;
 using ButaAPI.Database.ViewModel;
 using ButaAPI.Services.Abstracts;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Reflection.Metadata;
 
 namespace ButaAPI.Controllers.Client
 {
