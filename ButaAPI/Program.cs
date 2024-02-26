@@ -35,6 +35,7 @@ builder.Services
         o.UseNpgsql(builder.Configuration.GetConnectionString("ButaDbContext"), b => b.MigrationsAssembly("ButaAPI"));
     })
     .AddScoped<IUserService, UserService>()
+    .AddScoped<CookieService>()
     .AddScoped<IMailkitEmailService, MailkitEmailService>()
     .AddScoped<AuthExceptions>()
     .AddSingleton<IHttpContextAccessor, HttpContextAccessor>();

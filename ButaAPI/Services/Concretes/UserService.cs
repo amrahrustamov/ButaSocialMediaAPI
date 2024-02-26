@@ -33,34 +33,5 @@ namespace ButaAPI.Services.Concretes
             var currentUser = _butaDbContext.Users.FirstOrDefault(u => u.Email == claim.Value);
             return currentUser;
         }
-
-        public UserPrivateInfo GetUserShortInfo(int id)
-        {
-            var user = _butaDbContext.Users.FirstOrDefault(u => u.Id == id);
-
-            UserPrivateInfo userPrivateInfo = new UserPrivateInfo
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                AboutUser = user.AboutUser,
-                ProfileImage = user.ProfileImage,
-            };
-
-            return userPrivateInfo;
-        }
-        public UserPrivateInfo GetUserInfo(int id)
-        {
-            var user = _butaDbContext.Users.FirstOrDefault(u => u.Id == id);
-
-            UserPrivateInfo userPrivateInfo = new UserPrivateInfo
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                AboutUser = user.AboutUser,
-                ProfileImage = user.ProfileImage
-            };
-
-            return userPrivateInfo;
-        }
     }
 }

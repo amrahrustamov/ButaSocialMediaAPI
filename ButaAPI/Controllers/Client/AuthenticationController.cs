@@ -18,12 +18,13 @@ namespace ButaAPI.Controllers.Client
         private readonly AuthExceptions _authExceptions;
         private readonly ButaDbContext _butaDbContext;
         private readonly IMailkitEmailService _emailService;
-        public AuthenticationController(AuthExceptions authExceptions, ButaDbContext butaDbContext, IMailkitEmailService emailService)
+        private readonly CookieService _cookieService;
+        public AuthenticationController(AuthExceptions authExceptions, ButaDbContext butaDbContext, IMailkitEmailService emailService, CookieService cookieService)
         {
             _authExceptions = authExceptions;
             _butaDbContext = butaDbContext;
             _emailService = emailService;
-           
+            _cookieService = cookieService;
         }
         #region Send Email for Reset
         //[HttpPost]
@@ -95,19 +96,7 @@ namespace ButaAPI.Controllers.Client
             if (null != item) { ModelState.AddModelError(item.Key, item.Content); }
             if (!ModelState.IsValid) { return BadRequest(ModelState); }
 
-                var claims = new List<Claim>
-                {
-                    new Claim("Email", loginViewModel.Email),
-                    new Claim("Password", loginViewModel.Password),
-                };
-
-                var claimsIdentity = new ClaimsIdentity(
-                claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-                await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                claimsPrincipal);
+            _cookieService.CreateCookie(loginViewModel);
 
             var user = _butaDbContext.Users.FirstOrDefault(u => u.Email == loginViewModel.Email && u.Password == loginViewModel.Password);
             return Ok(user.Id);
@@ -120,8 +109,7 @@ namespace ButaAPI.Controllers.Client
         [Route("logout")]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme);
+            _cookieService.RemoveCookie();
             return Ok();
         }
         #endregion
