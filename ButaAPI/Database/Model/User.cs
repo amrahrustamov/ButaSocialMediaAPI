@@ -5,14 +5,15 @@ using ButaAPI.Database.Base;
 
 namespace ButaAPI.Database.Model
 {
-    public class User: BaseEntity<int>
+    public class User: BaseEntity<int>, IAuditable
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public string? PhoneNumber { get; set; }
-        public DateTime CreateTime { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public Location? WhereFrom { get; set; }
         public Location? CurrentLocation { get; set; }
         public DateTime? Birthday { get; set; }

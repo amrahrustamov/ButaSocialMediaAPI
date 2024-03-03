@@ -14,7 +14,7 @@ namespace ButaAPI.Database.ViewModel
         public User Owner { get; set; }
         public string OwnerFullName { get; set; }
         public bool IsPublic { get; set; } = true;
-        public DateTime DateTime { get; set; } = DateTime.Now;
+        public DateTime DateTime { get; set; } = DateTime.UtcNow;
         public List<string>? Image { get; set; }
     }
 }

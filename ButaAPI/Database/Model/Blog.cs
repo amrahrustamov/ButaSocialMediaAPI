@@ -4,7 +4,7 @@ using ButaAPI.Database.Base;
 
 namespace ButaAPI.Database.Model
 {
-    public class Blog: BaseEntity<int>
+    public class Blog: BaseEntity<int>, IAuditable
     {
         public string? Content { get; set; }
         public Location? Location { get; set; }
@@ -14,7 +14,8 @@ namespace ButaAPI.Database.Model
         public int OwnerId { get; set; }
         public User Owner { get; set; }
         public bool IsPublic { get; set; } = true;
-        public DateTime DateTime { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public List<string>? Image { get; set; }
     }
 }

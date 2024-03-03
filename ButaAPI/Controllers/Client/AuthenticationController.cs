@@ -71,7 +71,6 @@ namespace ButaAPI.Controllers.Client
                 LastName = _modifyText.NormalizeName(registerUserViewModel.LastName),
                 Email = registerUserViewModel.Email,
                 Password = registerUserViewModel.Password,
-                CreateTime = DateTime.UtcNow,
                 PhoneNumber = registerUserViewModel.PhoneNumber,
                 ProfileImage = "default.jpg"
             };

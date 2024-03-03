@@ -46,7 +46,6 @@ namespace ButaAPI.Controllers.Client
                 {
                     Id = notification.Id,
                     Content = notification.Content,
-                    DateTime = notification.DateTime,
                     Sender = _butaDbContext.Users.FirstOrDefault(u=>u.Id == notification.SenderId),
                     Receiver = _butaDbContext.Users.FirstOrDefault(u=>u.Id == notification.ReceiverId),
                     URl = notification.URl,
@@ -86,7 +85,6 @@ namespace ButaAPI.Controllers.Client
                     Owner = _butaDbContext.Users.FirstOrDefault(u => u.Id == blog.OwnerId),
                     OwnerFullName = user.FirstName + " " + user.LastName,
                     Content = blog.Content,
-                    DateTime = blog.DateTime,
                     Image = blog.Image,
                     Tags = blog.Tags,
                     IsPublic = blog.IsPublic,
@@ -116,11 +114,11 @@ namespace ButaAPI.Controllers.Client
                     Owner = _butaDbContext.Users.FirstOrDefault(u => u.Id == blog.OwnerId),
                     OwnerFullName = user.FirstName + " " + user.LastName,
                     Content = blog.Content,
-                    DateTime = blog.DateTime,
                     Image = blog.Image,
                     Tags = blog.Tags,
                     IsPublic = blog.IsPublic,
                     Id = blog.Id,
+                    DateTime = blog.CreatedAt,
                     Commets = _butaDbContext.Comments.Where(c=>c.BlogId == blog.Id).ToList(),
                     Likes = _butaDbContext.Likes.Where(l=>l.BlogId == blog.Id).ToList(),
                     Location = blog.Location
@@ -170,7 +168,6 @@ namespace ButaAPI.Controllers.Client
             {
                 OwnerId = user.Id,
                 Content = form.FirstOrDefault(d => d.Key == "text").Value,
-                DateTime = DateTime.UtcNow,
                 Image = new List<string>(),
                 Tags = stringList,
                 IsPublic = visibility.ToString() == "public",
@@ -260,13 +257,11 @@ namespace ButaAPI.Controllers.Client
                     Content = addCommentViewModel.Comment,
                     BlogId = addCommentViewModel.BlogId,
                     OwnerId = user.Id,
-                    DateTime = DateTime.UtcNow
                 };
                 var ownerOfBlog = _butaDbContext.Blogs.FirstOrDefault(b => b.Id == addCommentViewModel.BlogId);
                 Notifications notifications = new Notifications
                 {
                     Content= $"Added new comment to your blog by {user.FirstName} {user.LastName}",
-                    DateTime = DateTime.UtcNow,
                     SenderId = user.Id,
                     ReceiverId = ownerOfBlog.OwnerId,
                     URl = $"blog/{addCommentViewModel.BlogId}"
@@ -292,12 +287,10 @@ namespace ButaAPI.Controllers.Client
             {
                 OwnerId = user.Id,
                 BlogId= id,
-                DateTime=DateTime.UtcNow
             };
             Notifications notifications = new Notifications
             {
                 Content = $"Liked your blog by {user.FirstName} {user.LastName}",
-                DateTime = DateTime.UtcNow,
                 SenderId = user.Id,
                 ReceiverId = _butaDbContext.Blogs.FirstOrDefault(b => b.Id == id).OwnerId,
                 URl = $"blog/{liked.BlogId}"
@@ -327,7 +320,7 @@ namespace ButaAPI.Controllers.Client
                     Owner = _butaDbContext.Users.FirstOrDefault(user => comment.OwnerId == user.Id),
                     Content = comment.Content,
                     CommentId = comment.Id,
-                    DateTime = comment.DateTime
+                    DateTime = comment.CreatedAt
                 };
                 result.Add(getCommentViewModel);
             }
@@ -354,7 +347,6 @@ namespace ButaAPI.Controllers.Client
                  Message message = new Message
                  {
                      Content = messageViewModel.Message,
-                     SendingTime = DateTime.UtcNow,
                      SenderId = user.Id,
                      ReceiverId = messageViewModel.Id
                  };
@@ -392,7 +384,6 @@ namespace ButaAPI.Controllers.Client
                 {
                     UserId = user.Id,
                     FriendsId = userId,
-                    DateTime = DateTime.UtcNow
                 };
                 _butaDbContext.Add(request);
                 _butaDbContext.SaveChanges();

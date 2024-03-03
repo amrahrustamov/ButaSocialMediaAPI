@@ -1,4 +1,5 @@
-﻿using ButaAPI.Database.Model;
+﻿using ButaAPI.Database.Base;
+using ButaAPI.Database.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace ButaAPI.Database
@@ -9,6 +10,29 @@ namespace ButaAPI.Database
         public ButaDbContext(IConfiguration configuration)
         {
             _configuration = configuration;
+        }
+        public override int SaveChanges()
+        {
+            foreach (var entry in ChangeTracker.Entries())
+            {
+                if (entry.Entity is not IAuditable)
+                    continue;
+
+                IAuditable auditable = (IAuditable)entry.Entity;
+
+                if (entry.State == EntityState.Added)
+                {
+                    auditable.CreatedAt = DateTime.UtcNow;
+                    auditable.UpdatedAt = DateTime.UtcNow;
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    auditable.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+
+            return base.SaveChanges();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
