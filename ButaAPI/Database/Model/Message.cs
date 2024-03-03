@@ -1,14 +1,12 @@
 ﻿using ButaAPI.Database.Model.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using ButaAPI.Database.Base;
 
 namespace ButaAPI.Database.Model
 {
-    public class Message
+    public class Message:BaseEntity<int>
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
         public string Content { get; set; }
         public DateTime SendingTime { get; set; } = DateTime.Now;
         public MessageStatus Status { get; set; } = MessageStatus.Sent;

@@ -170,7 +170,7 @@ namespace ButaAPI.Controllers.Client
             {
                 OwnerId = user.Id,
                 Content = form.FirstOrDefault(d => d.Key == "text").Value,
-                DateTime = DateTime.UtcNow.Date,
+                DateTime = DateTime.UtcNow,
                 Image = new List<string>(),
                 Tags = stringList,
                 IsPublic = visibility.ToString() == "public",

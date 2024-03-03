@@ -1,13 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using ButaAPI.Database.Base;
 
 namespace ButaAPI.Database.Model
 {
-    public class Location
+    public class Location: BaseEntity<int>
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
         public string Country { get; set; }
         public string? Region { get; set; }
         public string? City { get; set; }

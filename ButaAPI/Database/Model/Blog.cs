@@ -1,13 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using ButaAPI.Database.Base;
 
 namespace ButaAPI.Database.Model
 {
-    public class Blog
+    public class Blog: BaseEntity<int>
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
         public string? Content { get; set; }
         public Location? Location { get; set; }
         public List<string>? Tags { get; set; }

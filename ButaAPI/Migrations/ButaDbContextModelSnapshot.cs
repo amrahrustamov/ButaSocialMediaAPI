@@ -117,11 +117,11 @@ namespace ButaAPI.Migrations
 
             modelBuilder.Entity("ButaAPI.Database.Model.Friendships", b =>
                 {
-                    b.Property<int>("FriendshipId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FriendshipId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("User1Id")
                         .HasColumnType("integer");
@@ -132,7 +132,7 @@ namespace ButaAPI.Migrations
                     b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
-                    b.HasKey("FriendshipId");
+                    b.HasKey("Id");
 
                     b.HasIndex("UserId");
 

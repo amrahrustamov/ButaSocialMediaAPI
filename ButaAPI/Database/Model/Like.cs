@@ -1,14 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection.Metadata;
+using ButaAPI.Database.Base;
 
 namespace ButaAPI.Database.Model
 {
-    public class Like
+    public class Like : BaseEntity<int>
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
         public int BlogId { get; set; }
         public Blog Blog { get; set; }
         public int OwnerId { get; set; }
