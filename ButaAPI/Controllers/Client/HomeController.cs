@@ -56,6 +56,18 @@ namespace ButaAPI.Controllers.Client
             }
             return Ok(data);
         }
+        [HttpPost]
+        [Route("see-notification/{id}")]
+        public IActionResult SeeNotification(int id)
+        {
+            if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
+            var user = _userService.GetCurrentUser();
+
+            var notification = _butaDbContext.Notifications.FirstOrDefault(n => n.Id == id);
+            notification.Read = true;
+            _butaDbContext.SaveChanges();
+            return Ok();
+        }
         #endregion
 
         #region Blogs
