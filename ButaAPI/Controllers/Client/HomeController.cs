@@ -122,7 +122,7 @@ namespace ButaAPI.Controllers.Client
                     IsPublic = blog.IsPublic,
                     Id = blog.Id,
                     Commets = _butaDbContext.Comments.Where(c=>c.BlogId == blog.Id).ToList(),
-                    Likes = blog.Likes,
+                    Likes = _butaDbContext.Likes.Where(l=>l.BlogId == blog.Id).ToList(),
                     Location = blog.Location
                 };
                 data.Add(blogViewModel);
@@ -282,8 +282,8 @@ namespace ButaAPI.Controllers.Client
         }
 
         [HttpPost]
-        [Route("add_like")]
-        public IActionResult AddLike([FromBody] int blogId)
+        [Route("add-like-to-Blog/{id}")]
+        public IActionResult AddLike(int id)
         {
             if (!_userService.IsCurrentUserAuthenticated()) return NotFound();
             var user = _userService.GetCurrentUser();
@@ -291,9 +291,19 @@ namespace ButaAPI.Controllers.Client
             Like liked = new Like
             {
                 OwnerId = user.Id,
-                BlogId=blogId,
+                BlogId= id,
                 DateTime=DateTime.UtcNow
             };
+            Notifications notifications = new Notifications
+            {
+                Content = $"Liked your blog by {user.FirstName} {user.LastName}",
+                DateTime = DateTime.UtcNow,
+                SenderId = user.Id,
+                ReceiverId = _butaDbContext.Blogs.FirstOrDefault(b => b.Id == id).OwnerId,
+                URl = $"blog/{liked.BlogId}"
+            };
+
+            _butaDbContext.Notifications.Add(notifications);
             _butaDbContext.Likes.Add(liked);
             _butaDbContext.SaveChanges();
 
