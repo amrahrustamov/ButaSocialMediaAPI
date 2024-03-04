@@ -49,7 +49,9 @@ namespace ButaAPI.Controllers.Client
                     Sender = _butaDbContext.Users.FirstOrDefault(u=>u.Id == notification.SenderId),
                     Receiver = _butaDbContext.Users.FirstOrDefault(u=>u.Id == notification.ReceiverId),
                     URl = notification.URl,
-                    Read = notification.Read
+                    Read = notification.Read,
+                    DateTime = notification.CreatedAt
+
                 };
                 data.Add(notificationModel);
             }
@@ -173,7 +175,7 @@ namespace ButaAPI.Controllers.Client
                 IsPublic = visibility.ToString() == "public",
             };
 
-            if (files != null || blog.Content != null)
+            if (files.Count > 0 || blog.Content != "")
             {
                 if (files != null)
                 {
